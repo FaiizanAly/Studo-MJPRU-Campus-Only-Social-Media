@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Admin Dashboard — Studo</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      padding: 12px 20px; border-radius: var(--radius-lg);
+      font-size: 14px; font-weight: 500; color: white;
+      box-shadow: var(--shadow-lg);
+      animation: fadeIn 0.3s ease;
+    }
+    .toast.success { background: #34c759; }
+    .toast.error   { background: #ff3b30; }
+    .admin-table { width: 100%; border-collapse: collapse; }
+    .admin-table th {
+      text-align: left; padding: 10px 14px;
+      font-size: 12px; font-weight: 600;
+      color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.04em;
+      background: var(--bg-secondary); border-bottom: 1px solid var(--border-light);
+    }
+    .admin-table td {
+      padding: 12px 14px; font-size: 13px; color: var(--text-primary);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr { transition: background 0.15s; }
+    .admin-table tr:hover td { background: var(--bg-secondary); }
+    .trend-up   { color: #34c759; }
+    .trend-down { color: #ff3b30; }
+  </style>
+</head>
+<body>
+  <main style="padding-top:56px;min-height:100vh;background:var(--bg-primary);">
+    <div class="app-shell">
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar"></aside>
+
+      <!-- Main -->
+      <div class="main-content" style="padding:24px 20px;">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+              <h1 style="font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--text-primary);">Admin Dashboard</h1>
+              <span class="badge badge-red" style="font-size:10px;">Admin Access · MJPRU</span>
+            </div>
+            <p style="font-size:13px;color:var(--text-tertiary);">Manage student verifications, reports, and platform statistics.</p>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-secondary" style="font-size:13px;padding:8px 16px;" onclick="alert('Exporting report...')">
+              <i data-lucide="download" style="width:14px;height:14px;"></i> Export
+            </button>
+            <button class="btn-primary" style="font-size:13px;padding:8px 16px;" onclick="alert('Settings coming soon!')">
+              <i data-lucide="settings" style="width:14px;height:14px;"></i> Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div id="stat-cards" class="admin-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px;"></div>
+
+        <!-- Two-column section -->
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;flex-wrap:wrap;">
+
+          <!-- Pending Verifications Table -->
+          <div class="card-flat" style="overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:15px;font-weight:600;color:var(--text-primary);">Pending Verifications</div>
+              <span id="v-count" class="badge badge-orange"></span>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" id="v-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Submitted</th>
+                    <th style="text-align:center;">ID Card</th>
+                    <th style="text-align:center;">Fee Slip</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="v-tbody"></tbody>
+              </table>
+              <div id="v-empty" style="display:none;padding:32px;text-align:center;color:var(--text-tertiary);font-size:14px;">
+                ✅ All verifications processed!
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="card-flat" style="overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border-light);">
+              <div style="font-size:15px;font-weight:600;color:var(--text-primary);">Recent Activity</div>
+            </div>
+            <div style="padding:8px 0;">
+              ${[
+                {icon:'user-check', color:'#34c759', text:'Anjali Singh verified', time:'5m ago'},
+                {icon:'flag',       color:'#ff3b30', text:'Report resolved: spam post', time:'18m ago'},
+                {icon:'users',      color:'#0071e3', text:'New community created: CSE Club', time:'1h ago'},
+                {icon:'user-plus',  color:'#af52de', text:'12 new registrations today', time:'2h ago'},
+                {icon:'shield-check',color:'#ff9f0a',text:'Verification batch reviewed', time:'3h ago'},
+              ].map(a => `
+                <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+                  <div style="width:32px;height:32px;border-radius:50%;background:${a.color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i data-lucide="${a.icon}" style="width:14px;height:14px;color:${a.color};"></i>
+                  </div>
+                  <div style="flex:1;">
+                    <div style="font-size:13px;color:var(--text-primary);font-weight:500;">${a.text}</div>
+                    <div style="font-size:11px;color:var(--text-tertiary);">${a.time}</div>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Reports Section -->
+        <div class="card-flat" style="overflow:hidden;margin-top:20px;">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:15px;font-weight:600;color:var(--text-primary);">Active Reports</div>
+            <span class="badge badge-red">5 Open</span>
+          </div>
+          <div style="padding:0;">
+            ${[
+              {user:'Anonymous',   reason:'Spam',             target:'Post by Zaid Khan',  time:'1h ago'},
+              {user:'Priya Sharma',reason:'Inappropriate content',target:'Comment on feed', time:'3h ago'},
+              {user:'Rahul Verma', reason:'Fake listing',     target:'Marketplace item',   time:'5h ago'},
+              {user:'System',      reason:'Bot activity detected',target:'New account',    time:'8h ago'},
+              {user:'Anjali Singh',reason:'Harassment',       target:'Private message',    time:'1d ago'},
+            ].map(r => `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border-light);flex-wrap:wrap;gap:8px;">
+                <div>
+                  <div style="font-size:13px;font-weight:500;color:var(--text-primary);">${r.reason}</div>
+                  <div style="font-size:12px;color:var(--text-tertiary);">By ${r.user} · ${r.target} · ${r.time}</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn-ghost" style="padding:6px 12px;font-size:12px;" onclick="alert('Opening report details...')">Review</button>
+                  <button class="btn-danger" style="padding:6px 12px;font-size:12px;border-radius:var(--radius-full);" onclick="this.closest('div[style]').remove();showToast('Report dismissed','error')">Dismiss</button>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    let verifications = [...pendingVerifications];
+
+    function showToast(msg, type = 'success') {
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.textContent = (type === 'success' ? '✅ ' : '❌ ') + msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    function renderStats() {
+      document.getElementById('stat-cards').innerHTML = adminStats.map(s => `
+        <div class="stat-card hover-lift">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.04em;">${s.label}</div>
+            <div style="width:32px;height:32px;border-radius:10px;background:${s.color}22;display:flex;align-items:center;justify-content:center;">
+              <i data-lucide="${s.trend === 'up' ? 'trending-up' : 'trending-down'}" style="width:16px;height:16px;color:${s.color};"></i>
+            </div>
+          </div>
+          <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em;color:var(--text-primary);">${s.value}</div>
+          <div class="${s.trend === 'up' ? 'trend-up' : 'trend-down'}" style="font-size:13px;font-weight:500;">
+            ${s.trend === 'up' ? '↑' : '↓'} ${s.change} this week
+          </div>
+        </div>`).join('');
+    }
+
+    function renderVerifications() {
+      const tbody = document.getElementById('v-tbody');
+      document.getElementById('v-count').textContent = verifications.length + ' pending';
+
+      if (verifications.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('v-empty').style.display = 'block';
+        document.getElementById('v-table').style.display = 'none';
+        return;
+      }
+      document.getElementById('v-table').style.display = 'table';
+      document.getElementById('v-empty').style.display = 'none';
+
+      tbody.innerHTML = verifications.map(v => `
+        <tr id="row-${v.id}">
+          <td>
+            <div style="font-weight:600;color:var(--text-primary);">${v.name}</div>
+            <div style="font-size:11px;color:var(--text-tertiary);">${v.email}</div>
+          </td>
+          <td style="color:var(--text-tertiary);">${v.submittedAt}</td>
+          <td style="text-align:center;">
+            ${v.idUploaded
+              ? `<span style="color:#34c759;font-size:16px;">✓</span>`
+              : `<span style="color:#ff3b30;font-size:16px;">✗</span>`}
+          </td>
+          <td style="text-align:center;">
+            ${v.feeSlipUploaded
+              ? `<span style="color:#34c759;font-size:16px;">✓</span>`
+              : `<span style="color:#ff3b30;font-size:16px;">✗</span>`}
+          </td>
+          <td style="text-align:right;">
+            <div style="display:flex;gap:6px;justify-content:flex-end;">
+              <button class="btn-primary" style="padding:6px 12px;font-size:12px;border-radius:8px;"
+                onclick="approveVerification('${v.id}')">Approve</button>
+              <button class="btn-danger" style="padding:6px 12px;font-size:12px;border-radius:8px;"
+                onclick="rejectVerification('${v.id}')">Reject</button>
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+
+    function approveVerification(id) {
+      const row = document.getElementById('row-' + id);
+      if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.3s'; setTimeout(() => row.remove(), 300); }
+      verifications = verifications.filter(v => v.id !== id);
+      setTimeout(() => { renderVerifications(); showToast('Student approved & verified!', 'success'); }, 350);
+    }
+
+    function rejectVerification(id) {
+      const row = document.getElementById('row-' + id);
+      if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.3s'; setTimeout(() => row.remove(), 300); }
+      verifications = verifications.filter(v => v.id !== id);
+      setTimeout(() => { renderVerifications(); showToast('Verification rejected.', 'error'); }, 350);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      auth.ensureDemo();
+      buildSidebar('sidebar');
+      renderStats();
+      renderVerifications();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

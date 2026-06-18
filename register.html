@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — Studo</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .auth-page { min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 16px 40px;background:var(--bg-primary);position:relative;overflow:hidden; }
+    .auth-orb { position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none; }
+    .auth-card { background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:40px 36px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);position:relative;z-index:1;animation:fadeInUp 0.5s ease both; }
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Step indicator */
+    .step-indicator { display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:32px; }
+    .step-dot { width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all 0.3s;flex-shrink:0; }
+    .step-dot.active { background:linear-gradient(135deg,#0071e3,#5856d6);color:#fff;box-shadow:0 4px 14px rgba(0,113,227,0.4); }
+    .step-dot.done { background:#34c759;color:#fff; }
+    .step-dot.pending { background:var(--bg-secondary);color:var(--text-tertiary);border:2px solid var(--border-light); }
+    .step-line { flex:1;height:2px;max-width:40px;background:var(--border-light);transition:background 0.3s; }
+    .step-line.done { background:linear-gradient(90deg,#34c759,#0071e3); }
+
+    /* Panels */
+    .step-panel { display:none; }
+    .step-panel.active { display:block; }
+
+    .step-title { font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:4px;letter-spacing:-0.3px; }
+    .step-subtitle { font-size:13px;color:var(--text-secondary);margin-bottom:22px; }
+
+    .btn-row { display:flex;gap:10px;margin-top:20px; }
+    .btn-row .btn-secondary,.btn-row .btn-primary { flex:1;justify-content:center;padding:12px; }
+
+    /* Upload area */
+    .upload-zone { border:2px dashed var(--border-light);border-radius:var(--radius-lg);padding:24px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s; }
+    .upload-zone:hover { border-color:var(--accent-blue);background:var(--accent-blue-light); }
+    .upload-zone input { display:none; }
+    .upload-zone-icon { font-size:28px;margin-bottom:8px; }
+    .upload-zone-text { font-size:13px;color:var(--text-secondary); }
+    .upload-zone-text strong { color:var(--accent-blue); }
+    .upload-filename { font-size:12px;color:#34c759;margin-top:6px;font-weight:600; }
+
+    /* Success */
+    .success-screen { text-align:center;padding:16px 0; }
+    .success-check { width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#34c759,#30d158);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:36px;animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @keyframes popIn{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
+    .success-title { font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:8px; }
+    .success-subtitle { font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px; }
+    .success-badges { display:flex;flex-direction:column;gap:10px;margin-bottom:24px; }
+    .success-badge-row { display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-secondary);border-radius:10px;font-size:13px;color:var(--text-primary); }
+
+    .pw-wrapper { position:relative; }
+    .pw-toggle { position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:4px; }
+    .pw-toggle:hover { color:var(--accent-blue); }
+    .pw-wrapper .input-field { padding-right:40px; }
+
+    .mjpru-note { font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:16px;padding:8px 12px;background:var(--bg-secondary);border-radius:8px;line-height:1.5; }
+    .auth-logo { display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px; }
+    .auth-logo-text { font-size:22px;font-weight:800;color:var(--text-primary); }
+
+    .pw-strength { height:3px;border-radius:2px;margin-top:4px;transition:all 0.3s; }
+    .pw-strength-label { font-size:11px;color:var(--text-tertiary);margin-top:3px; }
+  </style>
+</head>
+<body>
+  <main style="padding-top:0;min-height:100vh;background:var(--bg-primary);">
+    <div class="auth-page">
+      <div class="auth-orb" style="width:500px;height:500px;top:-200px;right:-150px;background:radial-gradient(circle,rgba(88,86,214,0.14) 0%,transparent 70%);"></div>
+      <div class="auth-orb" style="width:400px;height:400px;bottom:-120px;left:-150px;background:radial-gradient(circle,rgba(0,113,227,0.12) 0%,transparent 70%);"></div>
+
+      <div class="auth-card">
+        <!-- Logo -->
+        <div class="auth-logo">
+          <span style="font-size:28px;">📚</span>
+          <span class="auth-logo-text">Studo</span>
+        </div>
+
+        <!-- Step indicator -->
+        <div class="step-indicator" id="step-indicator">
+          <div class="step-dot active" id="dot-1">1</div>
+          <div class="step-line" id="line-1"></div>
+          <div class="step-dot pending" id="dot-2">2</div>
+          <div class="step-line" id="line-2"></div>
+          <div class="step-dot pending" id="dot-3">3</div>
+          <div class="step-line" id="line-3"></div>
+          <div class="step-dot pending" id="dot-4">✓</div>
+        </div>
+
+        <!-- ═══════ STEP 1 ═══════ -->
+        <div class="step-panel active" id="step-1">
+          <div class="step-title">Create your account</div>
+          <div class="step-subtitle">Start with your basic details</div>
+          <div style="display:flex;flex-direction:column;gap:13px;">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="r-name" class="input-field" placeholder="e.g. Rahul Verma" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">University Email</label>
+              <input type="email" id="r-email" class="input-field" placeholder="you@mjpru.ac.in" required>
+              <div class="form-hint">Must be your @mjpru.ac.in email address</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <div class="pw-wrapper">
+                <input type="password" id="r-password" class="input-field" placeholder="At least 8 characters" oninput="checkStrength(this.value)" required>
+                <button type="button" class="pw-toggle" onclick="togglePw('r-password','pw-icon-1')">
+                  <i data-lucide="eye" id="pw-icon-1" style="width:16px;height:16px;"></i>
+                </button>
+              </div>
+              <div class="pw-strength" id="pw-strength" style="background:var(--border-light);width:0%;"></div>
+              <div class="pw-strength-label" id="pw-strength-label"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm Password</label>
+              <div class="pw-wrapper">
+                <input type="password" id="r-confirm" class="input-field" placeholder="Re-enter password" required>
+                <button type="button" class="pw-toggle" onclick="togglePw('r-confirm','pw-icon-2')">
+                  <i data-lucide="eye" id="pw-icon-2" style="width:16px;height:16px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" style="flex:1;justify-content:center;padding:12px;" onclick="goStep(2)">
+              Next <i data-lucide="arrow-right" style="width:14px;height:14px;margin-left:4px;"></i>
+            </button>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);text-align:center;margin-top:16px;">Already have an account? <a href="login.html" style="color:var(--accent-blue);text-decoration:none;font-weight:600;">Sign in</a></p>
+        </div>
+
+        <!-- ═══════ STEP 2 ═══════ -->
+        <div class="step-panel" id="step-2">
+          <div class="step-title">Academic details</div>
+          <div class="step-subtitle">Tell us about your course at MJPRU</div>
+          <div style="display:flex;flex-direction:column;gap:13px;">
+            <div class="form-group">
+              <label class="form-label">Department</label>
+              <select id="r-dept" class="input-field">
+                <option value="">Select your department</option>
+                <option value="CSIT">CSIT — Computer Science &amp; IT</option>
+                <option value="MCA">MCA — Master of Computer Applications</option>
+                <option value="BCA">BCA — Bachelor of Computer Applications</option>
+                <option value="BSc-CS">B.Sc Computer Science</option>
+                <option value="MBA">MBA — Master of Business Administration</option>
+                <option value="BBA">BBA — Bachelor of Business Administration</option>
+                <option value="LLB">LLB — Bachelor of Laws</option>
+                <option value="BSc">B.Sc (Other)</option>
+                <option value="BCom">B.Com</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Current Semester</label>
+              <select id="r-sem" class="input-field">
+                <option value="">Select semester</option>
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+                <option value="3">3rd Semester</option>
+                <option value="4">4th Semester</option>
+                <option value="5">5th Semester</option>
+                <option value="6">6th Semester</option>
+                <option value="7">7th Semester</option>
+                <option value="8">8th Semester</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Student ID / Enrollment Number</label>
+              <input type="text" id="r-rollno" class="input-field" placeholder="e.g. 230113014" required>
+              <div class="form-hint">Your MJPRU university enrollment number</div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+            <button class="btn-primary" onclick="goStep(3)">Next <i data-lucide="arrow-right" style="width:14px;height:14px;margin-left:4px;"></i></button>
+          </div>
+        </div>
+
+        <!-- ═══════ STEP 3 ═══════ -->
+        <div class="step-panel" id="step-3">
+          <div class="step-title">Upload documents</div>
+          <div class="step-subtitle">Required for MJPRU student verification</div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <!-- Student ID -->
+            <div class="form-group">
+              <label class="form-label">Student ID Card</label>
+              <div class="upload-zone" onclick="document.getElementById('file-id').click()">
+                <input type="file" id="file-id" accept="image/*,.pdf" onchange="showFilename('file-id','filename-id')">
+                <div class="upload-zone-icon">🪪</div>
+                <div class="upload-zone-text"><strong>Click to upload</strong> or drag &amp; drop<br>JPG, PNG or PDF · Max 5MB</div>
+                <div class="upload-filename" id="filename-id"></div>
+              </div>
+            </div>
+            <!-- Fee receipt -->
+            <div class="form-group">
+              <label class="form-label">Fee Receipt</label>
+              <div class="upload-zone" onclick="document.getElementById('file-fee').click()">
+                <input type="file" id="file-fee" accept="image/*,.pdf" onchange="showFilename('file-fee','filename-fee')">
+                <div class="upload-zone-icon">🧾</div>
+                <div class="upload-zone-text"><strong>Click to upload</strong> your fee payment receipt<br>JPG, PNG or PDF · Max 5MB</div>
+                <div class="upload-filename" id="filename-fee"></div>
+              </div>
+            </div>
+            <div style="padding:10px 12px;background:var(--accent-blue-light);border-radius:10px;font-size:12px;color:var(--accent-blue);line-height:1.5;">
+              🔒 Your documents are encrypted and only reviewed by MJPRU admins. Verification takes up to 24 hours.
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="goStep(2)">← Back</button>
+            <button class="btn-primary" onclick="submitRegistration()">Submit for Review ✓</button>
+          </div>
+        </div>
+
+        <!-- ═══════ STEP 4 — SUCCESS ═══════ -->
+        <div class="step-panel" id="step-4">
+          <div class="success-screen">
+            <div class="success-check">✅</div>
+            <div class="success-title">Application Submitted!</div>
+            <div class="success-subtitle">Your MJPRU Studo account is under review. You'll receive a confirmation email once approved.</div>
+            <div class="success-badges">
+              <div class="success-badge-row">📧 <span>Verification email sent to your MJPRU address</span></div>
+              <div class="success-badge-row">⏱️ <span>Review typically takes 12–24 hours</span></div>
+              <div class="success-badge-row">🎓 <span>Once verified, full campus access unlocked</span></div>
+            </div>
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Redirecting to your feed in <span id="countdown">2</span>s…</div>
+            <a href="feed.html" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;">
+              Go to Feed Now <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Bottom note (hidden on step 4) -->
+        <div class="mjpru-note" id="bottom-note">
+          🎓 MJPRU students only · @mjpru.ac.in email required · Free forever
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      lucide.createIcons();
+    });
+
+    function togglePw(inputId, iconId) {
+      const inp = document.getElementById(inputId);
+      const ico = document.getElementById(iconId);
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      ico.setAttribute('data-lucide', show ? 'eye-off' : 'eye');
+      lucide.createIcons();
+    }
+
+    function checkStrength(val) {
+      const bar = document.getElementById('pw-strength');
+      const lbl = document.getElementById('pw-strength-label');
+      if (!val) { bar.style.width = '0'; lbl.textContent = ''; return; }
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const colors = ['#ff3b30','#ff9f0a','#34c759','#0071e3'];
+      const labels = ['Weak','Fair','Good','Strong'];
+      const pcts   = ['25%','50%','75%','100%'];
+      bar.style.width   = pcts[score - 1] || '0';
+      bar.style.background = colors[score - 1] || 'var(--border-light)';
+      lbl.textContent   = score ? labels[score - 1] : '';
+      lbl.style.color   = colors[score - 1] || 'var(--text-tertiary)';
+    }
+
+    function showFilename(inputId, labelId) {
+      const file = document.getElementById(inputId).files[0];
+      const lbl  = document.getElementById(labelId);
+      lbl.textContent = file ? '✅ ' + file.name : '';
+    }
+
+    function goStep(n) {
+      // Basic validation
+      if (n === 2) {
+        const name  = document.getElementById('r-name').value.trim();
+        const email = document.getElementById('r-email').value.trim();
+        const pw    = document.getElementById('r-password').value;
+        const conf  = document.getElementById('r-confirm').value;
+        if (!name)  { alert('Please enter your full name.'); return; }
+        if (!email.endsWith('@mjpru.ac.in')) { alert('Please use your @mjpru.ac.in email.'); return; }
+        if (pw.length < 6) { alert('Password must be at least 6 characters.'); return; }
+        if (pw !== conf) { alert('Passwords do not match.'); return; }
+      }
+      if (n === 3) {
+        if (!document.getElementById('r-dept').value) { alert('Please select your department.'); return; }
+        if (!document.getElementById('r-sem').value)  { alert('Please select your semester.'); return; }
+        if (!document.getElementById('r-rollno').value.trim()) { alert('Please enter your Student ID.'); return; }
+      }
+
+      // Update dots
+      for (let i = 1; i <= 4; i++) {
+        const dot  = document.getElementById('dot-' + i);
+        const line = document.getElementById('line-' + i);
+        if (i < n) { dot.className = 'step-dot done'; dot.textContent = '✓'; }
+        else if (i === n) { dot.className = 'step-dot active'; dot.textContent = i === 4 ? '✓' : i; }
+        else { dot.className = 'step-dot pending'; dot.textContent = i === 4 ? '✓' : i; }
+        if (line) line.className = 'step-line' + (i < n ? ' done' : '');
+      }
+
+      // Show panel
+      document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('step-' + n).classList.add('active');
+
+      if (n === 4) document.getElementById('bottom-note').style.display = 'none';
+      lucide.createIcons();
+    }
+
+    function submitRegistration() {
+      const name  = document.getElementById('r-name').value.trim() || 'Demo Student';
+      const email = document.getElementById('r-email').value.trim() || 'demo@mjpru.ac.in';
+      const dept  = document.getElementById('r-dept').value || 'CSIT';
+      const sem   = document.getElementById('r-sem').value || '1';
+
+      // Auto-login with demo data
+      auth.login({
+        id: 'u_new',
+        name: name,
+        initials: name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2),
+        email: email,
+        university: 'MJPRU, Bareilly',
+        semester: sem + (sem === '1' ? 'st' : sem === '2' ? 'nd' : sem === '3' ? 'rd' : 'th') + ' Semester',
+        department: dept,
+        verified: false,
+        avatarColor: 'linear-gradient(135deg, #0071e3, #5856d6)',
+      }, 'new-user-token');
+
+      goStep(4);
+
+      // Countdown
+      let t = 2;
+      const cd = document.getElementById('countdown');
+      const timer = setInterval(() => {
+        t--;
+        if (cd) cd.textContent = t;
+        if (t <= 0) { clearInterval(timer); window.location.href = 'feed.html'; }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

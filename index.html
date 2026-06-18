@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studo — Campus Social Media for MJPRU, Bareilly</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root { --hero-gradient: linear-gradient(135deg, #0071e3 0%, #5856d6 100%); }
+    .hero-orb { position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0; }
+    .hero-section { position:relative;overflow:hidden;min-height:100vh;display:flex;align-items:center;padding:120px 24px 80px;background:var(--bg-primary); }
+    .hero-inner { position:relative;z-index:1;max-width:780px;margin:0 auto;text-align:center; }
+    .mjpru-badge { display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:var(--radius-full);background:var(--accent-blue-light);border:1px solid rgba(0,113,227,0.25);font-size:13px;font-weight:600;color:var(--accent-blue);margin-bottom:28px;animation:fadeInDown 0.6s ease both; }
+    .hero-headline { font-size:clamp(42px,6vw,72px);font-weight:700;letter-spacing:-2px;line-height:1.08;color:var(--text-primary);margin-bottom:20px;animation:fadeInUp 0.7s ease 0.1s both; }
+    .hero-headline .gradient-text { background:var(--hero-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+    .hero-subtitle { font-size:18px;color:var(--text-secondary);line-height:1.6;max-width:560px;margin:0 auto 36px;animation:fadeInUp 0.7s ease 0.2s both; }
+    .hero-cta-row { display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:52px;animation:fadeInUp 0.7s ease 0.3s both; }
+    .hero-cta-row .btn-primary,.hero-cta-row .btn-secondary { padding:14px 28px;font-size:16px; }
+    .hero-stats { display:flex;justify-content:center;gap:48px;flex-wrap:wrap;animation:fadeInUp 0.7s ease 0.4s both; }
+    .hero-stat { text-align:center; }
+    .hero-stat-val { font-size:28px;font-weight:700;color:var(--text-primary);letter-spacing:-0.5px; }
+    .hero-stat-label { font-size:12px;color:var(--text-tertiary);margin-top:2px;font-weight:500; }
+    .section-label { font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-blue);margin-bottom:8px; }
+    .section-title { font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-1px;color:var(--text-primary);margin-bottom:12px; }
+    .section-desc { font-size:16px;color:var(--text-secondary);max-width:520px;margin:0 auto;line-height:1.6; }
+    .section-header { text-align:center;margin-bottom:52px; }
+    .features-section { padding:96px 24px;background:var(--bg-secondary); }
+    .features-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:1120px;margin:0 auto; }
+    .feature-card { background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:28px 24px;transition:transform 0.2s ease,box-shadow 0.2s ease; }
+    .feature-card:hover { transform:translateY(-4px);box-shadow:var(--shadow-lg); }
+    .feature-icon-wrap { width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px; }
+    .feature-icon-wrap svg { width:22px;height:22px; }
+    .feature-title { font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px; }
+    .feature-desc { font-size:14px;color:var(--text-secondary);line-height:1.55; }
+    .hiw-section { padding:96px 24px;background:var(--bg-primary); }
+    .hiw-steps { display:flex;gap:0;max-width:860px;margin:0 auto;position:relative; }
+    .hiw-steps::before { content:'';position:absolute;top:32px;left:calc(33.33%/2);right:calc(33.33%/2);height:2px;background:linear-gradient(90deg,var(--accent-blue),#5856d6);z-index:0; }
+    .hiw-step { flex:1;text-align:center;padding:0 20px;position:relative;z-index:1; }
+    .hiw-step-num { width:64px;height:64px;border-radius:50%;background:var(--hero-gradient);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 24px rgba(0,113,227,0.3); }
+    .hiw-step-title { font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:8px; }
+    .hiw-step-desc { font-size:14px;color:var(--text-secondary);line-height:1.55; }
+    .security-section { padding:96px 24px;background:var(--bg-secondary); }
+    .security-inner { max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center; }
+    @media(max-width:720px){.security-inner{grid-template-columns:1fr;}}
+    .security-list { list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:16px; }
+    .security-list li { display:flex;align-items:flex-start;gap:12px;font-size:15px;color:var(--text-primary);line-height:1.5; }
+    .security-check { width:22px;height:22px;border-radius:50%;background:#34c75920;color:#34c759;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;margin-top:1px; }
+    .security-mock-card { background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:24px;box-shadow:var(--shadow-md); }
+    .security-mock-row { display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:13px; }
+    .security-mock-row:last-of-type { border-bottom:none; }
+    .security-mock-row-label { color:var(--text-secondary); }
+    .security-mock-row-val { font-weight:600; }
+    .val-active { color:#34c759; }
+    .val-hidden { color:var(--accent-blue); }
+    .testimonials-section { padding:96px 24px;background:var(--bg-primary); }
+    .testimonials-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;max-width:1000px;margin:0 auto; }
+    .testimonial-card { background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow-sm); }
+    .testimonial-stars { color:#ff9f0a;font-size:14px;margin-bottom:14px; }
+    .testimonial-text { font-size:15px;color:var(--text-primary);line-height:1.65;margin-bottom:20px;font-style:italic; }
+    .testimonial-author { display:flex;align-items:center;gap:10px; }
+    .testimonial-avatar { width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0; }
+    .testimonial-name { font-size:13px;font-weight:700;color:var(--text-primary); }
+    .testimonial-meta { font-size:12px;color:var(--text-tertiary); }
+    .cta-section { padding:96px 24px;background:var(--bg-secondary); }
+    .cta-card { max-width:640px;margin:0 auto;text-align:center;background:var(--hero-gradient);border-radius:var(--radius-2xl);padding:56px 40px;color:#fff;box-shadow:0 20px 60px rgba(0,113,227,0.35); }
+    .cta-card h2 { font-size:32px;font-weight:700;margin-bottom:12px;letter-spacing:-0.5px; }
+    .cta-card p { font-size:16px;opacity:0.85;margin-bottom:32px;line-height:1.5; }
+    .cta-btn { display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#fff;color:var(--accent-blue);border-radius:var(--radius-full);font-weight:700;font-size:16px;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s; }
+    .cta-btn:hover { transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.18); }
+    footer { background:var(--bg-primary);border-top:1px solid var(--border-light);padding:40px 24px; }
+    .footer-inner { max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px; }
+    .footer-logo { display:flex;align-items:center;gap:8px;text-decoration:none; }
+    .footer-logo-text { font-size:18px;font-weight:800;color:var(--text-primary); }
+    .footer-links { display:flex;gap:20px;flex-wrap:wrap; }
+    .footer-links a { font-size:13px;color:var(--text-tertiary);text-decoration:none;transition:color 0.2s; }
+    .footer-links a:hover { color:var(--accent-blue); }
+    .footer-credit { font-size:12px;color:var(--text-tertiary);text-align:right; }
+    .footer-credit span { color:var(--accent-blue);font-weight:600; }
+    @keyframes fadeInDown { from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+    @media(max-width:600px){.hiw-steps{flex-direction:column;gap:36px;}.hiw-steps::before{display:none;}.hero-stats{gap:28px;}.footer-inner{flex-direction:column;align-items:flex-start;}.footer-credit{text-align:left;}}
+  </style>
+</head>
+<body>
+  <main style="padding-top:56px;">
+
+    <!-- HERO -->
+    <section class="hero-section">
+      <div class="hero-orb" style="width:600px;height:600px;top:-200px;right:-150px;background:radial-gradient(circle,rgba(88,86,214,0.18) 0%,transparent 70%);"></div>
+      <div class="hero-orb" style="width:500px;height:500px;bottom:-100px;left:-180px;background:radial-gradient(circle,rgba(0,113,227,0.15) 0%,transparent 70%);"></div>
+      <div class="hero-orb" style="width:300px;height:300px;top:30%;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(52,199,89,0.07) 0%,transparent 70%);"></div>
+      <div class="hero-inner">
+        <div class="mjpru-badge">🎓 Only for MJPRU, Bareilly · Verified Students</div>
+        <h1 class="hero-headline">Your campus.<br><span class="gradient-text">Your community.</span></h1>
+        <p class="hero-subtitle">Studo is MJPRU's exclusive social platform — share notes, find internships, buy &amp; sell on campus, and stay connected with 5000+ verified students of Mahatma Jyotiba Phule Rohilkhand University, Bareilly.</p>
+        <div class="hero-cta-row">
+          <a href="register.html" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;">Join MJPRU Studo <i data-lucide="arrow-right" style="width:16px;height:16px;"></i></a>
+          <a href="login.html" class="btn-secondary" style="display:inline-flex;align-items:center;gap:8px;">Sign in</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hero-stat-val">🎓 MJPRU</div><div class="hero-stat-label">University</div></div>
+          <div class="hero-stat"><div class="hero-stat-val">5,000+</div><div class="hero-stat-label">Students</div></div>
+          <div class="hero-stat"><div class="hero-stat-val">India 🇮🇳</div><div class="hero-stat-label">Bareilly, U.P.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features-section" id="features">
+      <div class="section-header">
+        <div class="section-label">Everything in one place</div>
+        <h2 class="section-title">Built for campus life</h2>
+        <p class="section-desc">Seven powerful features designed around how MJPRU students actually live and study.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon-wrap" style="background:#e8f4ff;"><i data-lucide="shield-check" style="color:#0071e3;"></i></div><div class="feature-title">Verified Students Only</div><div class="feature-desc">Every account is verified with your MJPRU student ID and fee receipt. No outsiders, no spam — a truly safe campus space.</div></div>
+        <div class="feature-card"><div class="feature-icon-wrap" style="background:#fff5e6;"><i data-lucide="book-open" style="color:#ff9f0a;"></i></div><div class="feature-title">Notes Sharing</div><div class="feature-desc">Upload and download semester notes, PYQs, and study materials for MCA, BCA, B.Sc CS and all MJPRU courses.</div></div>
+        <div class="feature-card"><div class="feature-icon-wrap" style="background:#f5f0ff;"><i data-lucide="shopping-bag" style="color:#af52de;"></i></div><div class="feature-title">Campus Marketplace</div><div class="feature-desc">Buy and sell books, gadgets, hostel appliances and more — within the campus community at fair prices.</div></div>
+        <div class="feature-card"><div class="feature-icon-wrap" style="background:#fff0f0;"><i data-lucide="map-pin" style="color:#ff3b30;"></i></div><div class="feature-title">Lost &amp; Found</div><div class="feature-desc">Report or find lost items anywhere on MJPRU campus. Smart filtering by date, location, and item type.</div></div>
+        <div class="feature-card"><div class="feature-icon-wrap" style="background:#f0fff5;"><i data-lucide="calendar" style="color:#34c759;"></i></div><div class="feature-title">Campus Events</div><div class="feature-desc">Stay updated on MJPRU fests, placement drives, workshops, and cultural events. Register with one tap.</div></div>
+        <div class="feature-card"><div class="feature-icon-wrap" style="background:#e8f4ff;"><i data-lucide="users" style="color:#5856d6;"></i></div><div class="feature-title">Communities</div><div class="feature-desc">Join department groups, coding clubs, photography society, and more. MJPRU's student life — all in one feed.</div></div>
+        <div class="feature-card"><div class="feature-icon-wrap" style="background:#fff5e6;"><i data-lucide="briefcase" style="color:#ff9f0a;"></i></div><div class="feature-title">Internship Network</div><div class="feature-desc">Discover internship and job opportunities posted by seniors, alumni, and campus placement cell directly in your feed.</div></div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="hiw-section" id="how-it-works">
+      <div class="section-header">
+        <div class="section-label">Simple 3-step process</div>
+        <h2 class="section-title">Get verified in minutes</h2>
+        <p class="section-desc">MJPRU student verification is fast and secure. Start connecting in under 5 minutes.</p>
+      </div>
+      <div class="hiw-steps">
+        <div class="hiw-step"><div class="hiw-step-num">1</div><div class="hiw-step-title">University Email</div><div class="hiw-step-desc">Sign up using your official <strong>@mjpru.ac.in</strong> email address to confirm you're an MJPRU student.</div></div>
+        <div class="hiw-step"><div class="hiw-step-num">2</div><div class="hiw-step-title">Upload Documents</div><div class="hiw-step-desc">Upload your MJPRU Student ID card and fee receipt. We review submissions within 24 hours.</div></div>
+        <div class="hiw-step"><div class="hiw-step-num">3</div><div class="hiw-step-title">Get Verified ✅</div><div class="hiw-step-desc">Receive your verified badge and unlock full access to all Studo features for MJPRU campus.</div></div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section class="security-section" id="security">
+      <div class="security-inner">
+        <div>
+          <div class="section-label" style="text-align:left;">Privacy first</div>
+          <h2 class="section-title" style="text-align:left;font-size:clamp(24px,3vw,36px);margin-bottom:24px;">Your data stays on campus</h2>
+          <ul class="security-list">
+            <li><div class="security-check">✓</div><span><strong>MJPRU-only access</strong> — only verified university students can see your profile and posts.</span></li>
+            <li><div class="security-check">✓</div><span><strong>Phone number hidden</strong> by default. Share contact details only when you choose to.</span></li>
+            <li><div class="security-check">✓</div><span><strong>End-to-end encrypted</strong> direct messages. Only you and your recipient can read them.</span></li>
+            <li><div class="security-check">✓</div><span><strong>Admin-reviewed verifications</strong> — every student document is manually reviewed by MJPRU admins.</span></li>
+            <li><div class="security-check">✓</div><span><strong>Report &amp; block</strong> any user or content immediately. Our team responds within 2 hours.</span></li>
+            <li><div class="security-check">✓</div><span><strong>Zero data selling</strong> — your information is never shared with third parties or advertisers.</span></li>
+          </ul>
+        </div>
+        <div class="security-mock-card">
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:16px;display:flex;align-items:center;gap:6px;">🔒 Privacy Settings</div>
+          <div class="security-mock-row"><span class="security-mock-row-label">Student Verification</span><span class="security-mock-row-val val-active">✅ Active</span></div>
+          <div class="security-mock-row"><span class="security-mock-row-label">Phone Visibility</span><span class="security-mock-row-val val-hidden">🔒 Hidden</span></div>
+          <div class="security-mock-row"><span class="security-mock-row-label">Profile Visibility</span><span class="security-mock-row-val">MJPRU Only</span></div>
+          <div class="security-mock-row"><span class="security-mock-row-label">Message Encryption</span><span class="security-mock-row-val val-active">✅ Enabled</span></div>
+          <div class="security-mock-row"><span class="security-mock-row-label">Data Sharing</span><span class="security-mock-row-val" style="color:#ff3b30;">❌ Disabled</span></div>
+          <div class="security-mock-row" style="border-bottom:none;"><span class="security-mock-row-label">Activity Status</span><span class="security-mock-row-val val-hidden">👤 Private</span></div>
+          <div style="margin-top:16px;padding:12px;background:var(--bg-secondary);border-radius:10px;text-align:center;"><div style="font-size:12px;color:var(--text-tertiary);">You are protected by</div><div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-top:2px;">🛡️ Studo Privacy Shield</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials-section" id="community">
+      <div class="section-header">
+        <div class="section-label">Student voices</div>
+        <h2 class="section-title">Loved by MJPRU students</h2>
+        <p class="section-desc">Hear what your fellow students have to say about Studo.</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card"><div class="testimonial-stars">★★★★★</div><p class="testimonial-text">"Studo literally saved my semester. Found Discrete Mathematics notes on exam night. The notes section is a goldmine for MJPRU students. Highly recommend to every MCA batch mate!"</p><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);">PS</div><div><div class="testimonial-name">Priya Sharma</div><div class="testimonial-meta">MCA · 2nd Year · MJPRU</div></div></div></div>
+        <div class="testimonial-card"><div class="testimonial-stars">★★★★★</div><p class="testimonial-text">"Sold my old semester books and hostel cooler within 2 days! The marketplace is amazing — every buyer is a verified MJPRU student so there's no risk. Perfect for hostel life."</p><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#34c759,#30d158);">RV</div><div><div class="testimonial-name">Rahul Verma</div><div class="testimonial-meta">BCA · 3rd Year · MJPRU</div></div></div></div>
+        <div class="testimonial-card"><div class="testimonial-stars">★★★★★</div><p class="testimonial-text">"Lost &amp; Found feature is a game-changer. I lost my student ID before exams and posted it on Studo — someone returned it the same evening. This app genuinely connects our campus!"</p><div class="testimonial-author"><div class="testimonial-avatar" style="background:linear-gradient(135deg,#ff9f0a,#ff6b00);">AS</div><div><div class="testimonial-name">Anjali Singh</div><div class="testimonial-meta">B.Sc CS · Final Year · MJPRU</div></div></div></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="cta-card">
+        <h2>Ready to join your campus community?</h2>
+        <p>5,000+ MJPRU students are already on Studo. Notes, events, marketplace, and more — all in one place.</p>
+        <a href="register.html" class="cta-btn">🎓 Join MJPRU Studo <i data-lucide="arrow-right" style="width:16px;height:16px;"></i></a>
+        <div style="margin-top:20px;font-size:13px;opacity:0.7;">@mjpru.ac.in email required · Free forever</div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-inner">
+        <a href="index.html" class="footer-logo"><span style="font-size:24px;">📚</span><span class="footer-logo-text">Studo</span></a>
+        <div class="footer-links"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Safety</a><a href="#">Contact</a><a href="feed.html">Feed</a><a href="admin.html">Admin</a></div>
+        <div class="footer-credit">Made with ❤️ by <span>Faizan Ali</span><br>MCA · CSIT · MJPRU, Bareilly</div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

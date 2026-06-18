@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lost & Found — Studo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main style="padding-top:56px;min-height:100vh;background:var(--bg-primary);">
+    <div class="app-shell">
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar"></aside>
+
+      <!-- Main -->
+      <div class="main-content" style="padding:24px 20px;">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h1 style="font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--text-primary);">Lost &amp; Found</h1>
+            <p style="font-size:13px;color:var(--text-tertiary);margin-top:2px;">Help your fellow MJPRU students reunite with their belongings.</p>
+          </div>
+          <button class="btn-primary" style="gap:8px;" onclick="document.getElementById('report-modal').style.display='flex'">
+            <i data-lucide="plus"></i> Report Item
+          </button>
+        </div>
+
+        <!-- Filters -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="filters">
+          <button class="chip active" onclick="filterItems('all',this)">All</button>
+          <button class="chip" onclick="filterItems('lost',this)">🔍 Lost</button>
+          <button class="chip" onclick="filterItems('found',this)">✅ Found</button>
+          <button class="chip" onclick="filterItems('claimed',this)">📦 Claimed</button>
+        </div>
+
+        <!-- Items Grid -->
+        <div id="items-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;"></div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Report Modal -->
+  <div id="report-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h2 style="font-size:18px;font-weight:700;color:var(--text-primary);">Report an Item</h2>
+        <button onclick="document.getElementById('report-modal').style.display='none'" style="background:none;border:none;color:var(--text-tertiary);cursor:pointer;"><i data-lucide="x"></i></button>
+      </div>
+
+      <!-- Lost/Found Toggle -->
+      <div style="display:flex;gap:0;border:1px solid var(--border-light);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;">
+        <button id="type-lost"  onclick="setType('lost')"  style="flex:1;padding:10px;border:none;background:var(--accent-blue);color:white;font-weight:600;font-size:14px;cursor:pointer;">🔍 Lost</button>
+        <button id="type-found" onclick="setType('found')" style="flex:1;padding:10px;border:none;background:var(--bg-secondary);color:var(--text-secondary);font-size:14px;cursor:pointer;">✅ Found</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Item Name</label>
+          <input class="input-field" id="r-title" placeholder="e.g. boAt Airdopes, Student ID Card">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="input-field" id="r-desc" rows="3" placeholder="Describe the item, color, any identifying features..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input class="input-field" id="r-location" placeholder="e.g. CSIT Dept., MJPRU Campus">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category Emoji</label>
+          <select class="input-field" id="r-icon">
+            <option value="📱">📱 Phone / Earbuds</option>
+            <option value="🎒">🎒 Bag / Backpack</option>
+            <option value="🪪">🪪 ID Card / Documents</option>
+            <option value="📚">📚 Books / Notes</option>
+            <option value="🔑">🔑 Keys</option>
+            <option value="💻">💻 Laptop / Electronics</option>
+            <option value="🧮">🧮 Calculator</option>
+            <option value="🍶">🍶 Water Bottle</option>
+            <option value="✒️">✒️ Pen / Stationery</option>
+            <option value="💰">💰 Wallet / Money</option>
+          </select>
+        </div>
+        <button class="btn-primary" style="width:100%;padding:13px;" onclick="submitReport()">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    let currentFilter = 'all';
+    let reportType = 'lost';
+
+    function setType(t) {
+      reportType = t;
+      document.getElementById('type-lost').style.background  = t === 'lost'  ? 'var(--accent-blue)' : 'var(--bg-secondary)';
+      document.getElementById('type-lost').style.color       = t === 'lost'  ? 'white' : 'var(--text-secondary)';
+      document.getElementById('type-found').style.background = t === 'found' ? 'var(--accent-blue)' : 'var(--bg-secondary)';
+      document.getElementById('type-found').style.color      = t === 'found' ? 'white' : 'var(--text-secondary)';
+    }
+
+    function filterItems(filter, el) {
+      currentFilter = filter;
+      document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderItems();
+    }
+
+    function renderItems() {
+      const grid = document.getElementById('items-grid');
+      let data = [...lostItems];
+      if (currentFilter === 'lost')    data = data.filter(i => i.type === 'lost' && !i.claimed);
+      if (currentFilter === 'found')   data = data.filter(i => i.type === 'found' && !i.claimed);
+      if (currentFilter === 'claimed') data = data.filter(i => i.claimed);
+
+      if (data.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i data-lucide="search-x" style="width:40px;height:40px;margin-bottom:8px;"></i><p>No items found</p></div>`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = data.map(item => {
+        const isLost  = item.type === 'lost';
+        const bgColor = item.bgColor || '#f0f5ff';
+        const actionBtn = item.claimed
+          ? `<button class="btn-secondary" style="width:100%;padding:10px;font-size:13px;" disabled>📦 Claimed</button>`
+          : isLost
+            ? `<button class="btn-primary" style="width:100%;padding:10px;font-size:13px;" onclick="alert('Contact ${item.reporter.name} about this item!')">✅ I Found This!</button>`
+            : `<button class="btn-primary" style="width:100%;padding:10px;font-size:13px;" onclick="alert('Contact ${item.reporter.name} to claim this item!')">🙋 This is Mine!</button>`;
+
+        return `
+          <div class="card" style="padding:20px;animation:fadeIn 0.4s ease both;">
+            <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">
+              <div style="width:52px;height:52px;border-radius:16px;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">${item.icon}</div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+                  <span class="${isLost ? 'badge-red' : 'badge-green'} badge" style="font-size:10px;">${isLost ? '🔍 LOST' : '✅ FOUND'}</span>
+                  ${item.claimed ? `<span class="badge" style="background:var(--bg-tertiary);color:var(--text-tertiary);font-size:10px;">CLAIMED</span>` : ''}
+                </div>
+                <div style="font-size:15px;font-weight:600;color:var(--text-primary);">${item.title}</div>
+              </div>
+            </div>
+
+            <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">${item.description}</p>
+
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-tertiary);">
+                <i data-lucide="map-pin" style="width:13px;height:13px;"></i>${item.location}
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-tertiary);">
+                <i data-lucide="calendar" style="width:13px;height:13px;"></i>${item.date}
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--border-light);margin-bottom:12px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:${item.reporter.avatarColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span style="color:white;font-size:10px;font-weight:700;">${item.reporter.initials}</span>
+              </div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:5px;">
+                  <span style="font-size:12px;font-weight:600;color:var(--text-primary);">${item.reporter.name}</span>
+                  ${item.reporter.verified ? `<div style="width:12px;height:12px;border-radius:50%;background:var(--accent-blue);display:flex;align-items:center;justify-content:center;"><i data-lucide="check" style="width:7px;height:7px;color:white;"></i></div>` : ''}
+                </div>
+                <div style="font-size:11px;color:var(--text-tertiary);">Reporter</div>
+              </div>
+            </div>
+
+            ${actionBtn}
+          </div>`;
+      }).join('');
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function submitReport() {
+      const title    = document.getElementById('r-title').value.trim();
+      const desc     = document.getElementById('r-desc').value.trim();
+      const location = document.getElementById('r-location').value.trim();
+      const icon     = document.getElementById('r-icon').value;
+      if (!title || !desc || !location) { alert('Please fill all fields!'); return; }
+
+      const user = auth.ensureDemo();
+      lostItems.unshift({
+        id: 'l' + Date.now(),
+        type: reportType,
+        title, description: desc, location, icon,
+        bgColor: '#f0f5ff',
+        date: new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }),
+        claimed: false,
+        reporter: { name: user.name, initials: user.initials, verified: user.verified, avatarColor: user.avatarColor }
+      });
+
+      document.getElementById('report-modal').style.display = 'none';
+      document.getElementById('r-title').value = '';
+      document.getElementById('r-desc').value = '';
+      document.getElementById('r-location').value = '';
+      renderItems();
+      alert('✅ Item reported successfully!');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      auth.ensureDemo();
+      buildSidebar('sidebar');
+      renderItems();
+    });
+  </script>
+</body>
+</html>

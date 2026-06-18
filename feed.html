@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Feed — Studo</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ─── Feed layout ─── */
+    .feed-shell {
+      display: grid;
+      grid-template-columns: 240px 1fr 280px;
+      gap: 24px;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 24px 16px 80px;
+      align-items: start;
+    }
+    @media (max-width: 1060px) {
+      .feed-shell { grid-template-columns: 200px 1fr; }
+      .right-panel { display: none; }
+    }
+    @media (max-width: 720px) {
+      .feed-shell { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+
+    /* ─── Create post card ─── */
+    .create-post-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .create-post-top {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .cp-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .cp-textarea {
+      flex: 1;
+      min-height: 44px;
+      max-height: 200px;
+      resize: none;
+      border: none;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: min-height 0.2s ease, box-shadow 0.2s;
+      width: 100%;
+      overflow: hidden;
+    }
+    .cp-textarea:focus {
+      min-height: 90px;
+      box-shadow: 0 0 0 2px rgba(0,113,227,0.25);
+      background: var(--bg-card);
+    }
+    .cp-textarea::placeholder { color: var(--text-tertiary); }
+    .cp-actions {
+      display: none;
+      margin-top: 12px;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .cp-actions.visible { display: flex; }
+    .cp-action-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 12px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-full);
+      font-size: 12px; font-weight: 600;
+      color: var(--text-secondary);
+      background: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cp-action-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .cp-post-btn { margin-left: auto; padding: 7px 20px; font-size: 13px; }
+    .cp-cancel-btn { font-size: 13px; padding: 7px 14px; }
+
+    /* ─── Post card ─── */
+    .post-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+    .post-card:hover { box-shadow: var(--shadow-md); }
+    .post-header { display: flex; align-items: center; gap: 11px; margin-bottom: 13px; }
+    .post-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .post-author-name {
+      font-size: 14px; font-weight: 700; color: var(--text-primary);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .verified-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px;
+      background: var(--accent-blue);
+      border-radius: 50%;
+      font-size: 9px; color: #fff;
+      flex-shrink: 0;
+    }
+    .post-meta { font-size: 12px; color: var(--text-tertiary); margin-top: 1px; }
+    .post-more-btn {
+      margin-left: auto;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-tertiary); padding: 4px 8px;
+      border-radius: 8px; transition: background 0.2s;
+      display: flex; align-items: center;
+    }
+    .post-more-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+
+    .post-content {
+      font-size: 15px; color: var(--text-primary);
+      line-height: 1.65; margin-bottom: 12px;
+    }
+    .post-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .post-tag {
+      font-size: 13px; color: var(--accent-blue);
+      font-weight: 600; cursor: pointer;
+    }
+    .post-tag:hover { text-decoration: underline; }
+
+    .post-divider { height: 1px; background: var(--border-light); margin-bottom: 12px; }
+
+    .post-actions { display: flex; gap: 4px; }
+    .post-action-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 12px;
+      border: none; background: none;
+      border-radius: var(--radius-md);
+      font-size: 13px; font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .post-action-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .post-action-btn.liked { color: #ff3b30; }
+    .post-action-btn.liked:hover { background: #fff0f0; }
+    .post-action-btn svg { width: 16px; height: 16px; }
+
+    /* ─── Right panel ─── */
+    .right-panel {
+      position: sticky;
+      top: 76px;
+    }
+    .rp-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .rp-title {
+      font-size: 13px; font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .trending-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+    .trending-row:hover { background: var(--bg-secondary); }
+    .trending-num {
+      width: 20px; font-size: 12px;
+      font-weight: 700; color: var(--text-tertiary);
+      flex-shrink: 0; text-align: center;
+    }
+    .trending-tag { font-size: 13px; font-weight: 700; color: var(--text-primary); flex: 1; }
+    .trending-count { font-size: 11px; color: var(--text-tertiary); }
+
+    .people-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .people-card:last-child { border-bottom: none; }
+    .people-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .people-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .people-meta { font-size: 11px; color: var(--text-tertiary); }
+    .follow-btn {
+      margin-left: auto;
+      padding: 5px 13px;
+      font-size: 12px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--accent-blue);
+      background: none;
+      color: var(--accent-blue);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .follow-btn:hover,.follow-btn.following { background: var(--accent-blue); color: #fff; }
+    .follow-btn.following { border-color: var(--accent-blue); }
+
+    /* ─── FAB ─── */
+    .fab {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0071e3, #5856d6);
+      color: #fff;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(0,113,227,0.45);
+      font-size: 28px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 100;
+    }
+    .fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(0,113,227,0.55); }
+    .fab svg { width: 24px; height: 24px; }
+
+    /* ─── Feed header ─── */
+    .feed-header {
+      font-size: 18px; font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ─── Empty new post animation ─── */
+    @keyframes postSlideIn {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .post-new { animation: postSlideIn 0.35s ease both; }
+  </style>
+</head>
+<body>
+  <!-- Navbar auto-injected -->
+
+  <main style="padding-top:56px;min-height:100vh;background:var(--bg-secondary);">
+    <div class="feed-shell">
+
+      <!-- ═══ LEFT SIDEBAR ═══ -->
+      <aside>
+        <div class="sidebar" id="sidebar" style="position:sticky;top:76px;"></div>
+      </aside>
+
+      <!-- ═══ MAIN FEED ═══ -->
+      <div>
+        <!-- Feed header -->
+        <div class="feed-header">🏠 Campus Feed</div>
+
+        <!-- Create post -->
+        <div class="create-post-card" id="create-post-card">
+          <div class="create-post-top">
+            <div class="cp-avatar" id="cp-avatar" style="background:linear-gradient(135deg,#0071e3,#5856d6);">FA</div>
+            <textarea
+              class="cp-textarea"
+              id="cp-textarea"
+              placeholder="Share something with your campus… 🎓"
+              rows="1"
+            ></textarea>
+          </div>
+          <div class="cp-actions" id="cp-actions">
+            <button class="cp-action-btn" onclick="alert('Photo upload — coming soon!')">
+              <i data-lucide="image" style="width:14px;height:14px;"></i> Photo
+            </button>
+            <button class="cp-action-btn" onclick="alert('File attach — coming soon!')">
+              <i data-lucide="paperclip" style="width:14px;height:14px;"></i> File
+            </button>
+            <button class="cp-action-btn" onclick="alert('Poll — coming soon!')">
+              <i data-lucide="bar-chart-2" style="width:14px;height:14px;"></i> Poll
+            </button>
+            <button class="btn-secondary cp-cancel-btn" onclick="cancelPost()">Cancel</button>
+            <button class="btn-primary cp-post-btn" onclick="publishPost()">Post</button>
+          </div>
+        </div>
+
+        <!-- Posts list -->
+        <div id="posts-list"></div>
+      </div>
+
+      <!-- ═══ RIGHT SIDEBAR ═══ -->
+      <aside class="right-panel">
+        <!-- Trending -->
+        <div class="rp-card">
+          <div class="rp-title">🔥 Trending on Campus</div>
+          <div id="trending-list"></div>
+        </div>
+
+        <!-- People you may know -->
+        <div class="rp-card">
+          <div class="rp-title">👥 People You May Know</div>
+          <div id="people-list"></div>
+        </div>
+
+        <!-- Studo note -->
+        <div style="font-size:11px;color:var(--text-tertiary);text-align:center;line-height:1.6;padding:0 8px;">
+          Made by <strong style="color:var(--accent-blue);">Faizan Ali</strong> · MCA · MJPRU<br>
+          © 2026 Studo · MJPRU, Bareilly
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Floating Action Button -->
+  <button class="fab" id="fab" title="Create post" onclick="focusCreatePost()">
+    <i data-lucide="plus"></i>
+  </button>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    // ─── State ───
+    let feedPosts = [];   // will be populated from mock data + any new posts
+
+    // ─── Trending hashtags ───
+    const trending = [
+      { tag: '#TECHNO2026',      count: '2.4k posts' },
+      { tag: '#MJPRUExams',      count: '1.8k posts' },
+      { tag: '#PlacementDrive',  count: '1.2k posts' },
+      { tag: '#MCA_CSIT',        count: '890 posts'  },
+      { tag: '#BareillyCampus',  count: '640 posts'  },
+    ];
+
+    // ─── People suggestions ───
+    const suggestions = [
+      { name: 'Neha Gupta',      meta: 'MCA · MJPRU',      initials: 'NG', color: 'linear-gradient(135deg,#0a84ff,#5e5ce6)',  followers: 670 },
+      { name: 'Priya Sharma',    meta: 'B.Sc CS · MJPRU',  initials: 'PS', color: 'linear-gradient(135deg,#ff6b6b,#ee5a24)', followers: 520 },
+      { name: 'Anjali Singh',    meta: 'BCA · MJPRU',      initials: 'AS', color: 'linear-gradient(135deg,#ff9f0a,#ff6b00)', followers: 445 },
+      { name: 'Mohd. Zaid Khan', meta: 'MCA · MJPRU',      initials: 'ZK', color: 'linear-gradient(135deg,#af52de,#5e5ce6)', followers: 189 },
+    ];
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Ensure demo user logged in
+      const user = auth.ensureDemo();
+
+      // Update create-post avatar
+      const cpAv = document.getElementById('cp-avatar');
+      if (cpAv && user) {
+        cpAv.style.background = user.avatarColor;
+        cpAv.textContent = user.initials;
+      }
+
+      // Build sidebar
+      buildSidebar('sidebar');
+
+      // Render feed from mock data
+      feedPosts = posts.map(p => ({ ...p }));   // shallow copy so we can mutate liked/likes
+      renderFeed();
+
+      // Render trending
+      renderTrending();
+
+      // Render people
+      renderPeople();
+
+      // Textarea expand
+      const ta = document.getElementById('cp-textarea');
+      ta.addEventListener('focus', expandPostBox);
+      ta.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+      });
+
+      lucide.createIcons();
+    });
+
+    // ─── Render feed ───
+    function renderFeed() {
+      const list = document.getElementById('posts-list');
+      list.innerHTML = feedPosts.map((p, i) => buildPostHTML(p, i)).join('');
+      lucide.createIcons();
+    }
+
+    function buildPostHTML(p, idx) {
+      const likedClass = p.liked ? 'liked' : '';
+      const likeCount  = p.likes;
+      const tags = (p.tags || []).map(t => `<span class="post-tag">#${t}</span>`).join('');
+      const verifiedBadge = p.author.verified
+        ? `<span class="verified-badge" title="Verified MJPRU student">✓</span>`
+        : '';
+
+      return `
+        <div class="post-card post-new" id="post-${p.id}">
+          <div class="post-header">
+            <div class="post-avatar" style="background:${p.author.avatarColor};">${p.author.initials}</div>
+            <div>
+              <div class="post-author-name">
+                ${escHtml(p.author.name)}
+                ${verifiedBadge}
+              </div>
+              <div class="post-meta">${escHtml(p.author.university)} · ${p.time}</div>
+            </div>
+            <button class="post-more-btn" title="More options" onclick="alert('Post options — coming soon!')">
+              <i data-lucide="more-horizontal" style="width:16px;height:16px;"></i>
+            </button>
+          </div>
+
+          <div class="post-content">${escHtml(p.content)}</div>
+
+          ${tags ? `<div class="post-tags">${tags}</div>` : ''}
+
+          <div class="post-divider"></div>
+
+          <div class="post-actions">
+            <button class="post-action-btn ${likedClass}" id="like-btn-${p.id}" onclick="toggleLike('${p.id}')">
+              <i data-lucide="${p.liked ? 'heart' : 'heart'}" id="like-icon-${p.id}"
+                 style="width:16px;height:16px;${p.liked ? 'fill:#ff3b30;color:#ff3b30;' : ''}"></i>
+              <span id="like-count-${p.id}">${likeCount}</span>
+            </button>
+            <button class="post-action-btn" onclick="alert('Comments — coming soon!')">
+              <i data-lucide="message-circle" style="width:16px;height:16px;"></i>
+              ${p.comments}
+            </button>
+            <button class="post-action-btn" onclick="alert('Shared!')">
+              <i data-lucide="share-2" style="width:16px;height:16px;"></i>
+              ${p.shares}
+            </button>
+          </div>
+        </div>`;
+    }
+
+    // ─── Toggle like ───
+    function toggleLike(postId) {
+      const post = feedPosts.find(p => p.id === postId);
+      if (!post) return;
+
+      post.liked = !post.liked;
+      post.likes += post.liked ? 1 : -1;
+
+      const btn   = document.getElementById('like-btn-' + postId);
+      const icon  = document.getElementById('like-icon-' + postId);
+      const count = document.getElementById('like-count-' + postId);
+
+      if (post.liked) {
+        btn.classList.add('liked');
+        icon.style.fill  = '#ff3b30';
+        icon.style.color = '#ff3b30';
+      } else {
+        btn.classList.remove('liked');
+        icon.style.fill  = '';
+        icon.style.color = '';
+      }
+      count.textContent = post.likes;
+
+      // Bounce animation
+      btn.style.transform = 'scale(1.3)';
+      setTimeout(() => { btn.style.transform = ''; btn.style.transition = 'transform 0.2s'; }, 150);
+    }
+
+    // ─── Create post ───
+    function expandPostBox() {
+      document.getElementById('cp-actions').classList.add('visible');
+    }
+    function cancelPost() {
+      document.getElementById('cp-textarea').value = '';
+      document.getElementById('cp-textarea').style.height = '';
+      document.getElementById('cp-actions').classList.remove('visible');
+    }
+    function publishPost() {
+      const ta      = document.getElementById('cp-textarea');
+      const content = ta.value.trim();
+      if (!content) { alert('Please write something first!'); return; }
+
+      const user = auth.getUser() || { name: 'Faizan Ali', initials: 'FA', verified: true, avatarColor: 'linear-gradient(135deg,#0071e3,#5856d6)' };
+
+      const newPost = {
+        id: 'p_new_' + Date.now(),
+        author: {
+          name: user.name,
+          initials: user.initials,
+          university: 'MJPRU, Bareilly',
+          verified: user.verified,
+          avatarColor: user.avatarColor,
+        },
+        content: content,
+        tags: extractHashtags(content),
+        likes: 0, comments: 0, shares: 0,
+        time: 'Just now',
+        liked: false,
+      };
+
+      feedPosts.unshift(newPost);
+
+      const list = document.getElementById('posts-list');
+      list.insertAdjacentHTML('afterbegin', buildPostHTML(newPost, 0));
+      lucide.createIcons();
+
+      cancelPost();
+    }
+    function extractHashtags(text) {
+      return (text.match(/#(\w+)/g) || []).map(t => t.slice(1));
+    }
+    function focusCreatePost() {
+      const ta = document.getElementById('cp-textarea');
+      ta.focus();
+      expandPostBox();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ─── Render trending ───
+    function renderTrending() {
+      const list = document.getElementById('trending-list');
+      list.innerHTML = trending.map((t, i) => `
+        <div class="trending-row">
+          <div class="trending-num">${i + 1}</div>
+          <div>
+            <div class="trending-tag">${t.tag}</div>
+            <div class="trending-count">${t.count}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    // ─── Render people ───
+    function renderPeople() {
+      const list = document.getElementById('people-list');
+      list.innerHTML = suggestions.map((u, i) => `
+        <div class="people-card">
+          <div class="people-avatar" style="background:${u.color};">${u.initials}</div>
+          <div>
+            <div class="people-name">${u.name}</div>
+            <div class="people-meta">${u.meta}</div>
+          </div>
+          <button class="follow-btn" id="follow-${i}" onclick="toggleFollow(${i})">Follow</button>
+        </div>`).join('');
+    }
+    function toggleFollow(i) {
+      const btn = document.getElementById('follow-' + i);
+      const following = btn.classList.contains('following');
+      btn.classList.toggle('following');
+      btn.textContent = following ? 'Follow' : 'Following';
+    }
+
+    // ─── Utility ───
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

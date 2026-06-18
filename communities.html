@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Communities — Studo</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .comm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    @media(max-width:800px){.comm-grid{grid-template-columns:1fr}}
+    .comm-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:24px;transition:box-shadow .2s,transform .2s;display:flex;flex-direction:column;}
+    .comm-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+    .chip{display:inline-flex;align-items:center;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:500;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-light);cursor:pointer;transition:all .15s}
+    .chip:hover{background:var(--accent-blue-light);color:var(--accent-blue)}
+    .chip.active{background:var(--accent-blue);color:white;border-color:var(--accent-blue)}
+    .btn-join{padding:9px 22px;border:none;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+    .btn-join.joined{background:#e6f9ee;color:#1a7f3c;}
+    .btn-join.not-joined{background:var(--accent-blue);color:white;}
+    .toast{position:fixed;bottom:24px;right:24px;background:#1c1c1e;color:white;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;z-index:9999;box-shadow:var(--shadow-lg);transform:translateY(20px);opacity:0;transition:all .3s}
+    .toast.show{transform:translateY(0);opacity:1}
+  </style>
+</head>
+<body>
+<main style="padding-top:56px;min-height:100vh;background:var(--bg-primary);">
+  <div style="max-width:1200px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:start;">
+    <div id="sidebar" style="position:sticky;top:72px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:16px;display:flex;flex-direction:column;gap:0;min-height:calc(100vh - 100px);"></div>
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div>
+          <h1 style="font-size:24px;font-weight:700;color:var(--text-primary);letter-spacing:-.02em;">👥 Communities &amp; Clubs</h1>
+          <p style="font-size:14px;color:var(--text-secondary);margin-top:2px;">Connect with your people at MJPRU</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--accent-blue-light);color:var(--accent-blue);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;">
+          <i data-lucide="users" style="width:14px;height:14px;"></i> 6 Communities
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;" id="chips">
+        <span class="chip active" data-f="All">All</span>
+        <span class="chip" data-f="Tech">💻 Tech</span>
+        <span class="chip" data-f="Academic">🎓 Academic</span>
+        <span class="chip" data-f="Arts">🎨 Arts</span>
+        <span class="chip" data-f="Business">🚀 Business</span>
+        <span class="chip" data-f="Gaming">🎮 Gaming</span>
+      </div>
+      <div class="comm-grid" id="grid"></div>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/components.js"></script>
+<script>
+const joinState={};
+communities.forEach(c=>{joinState[c.id]=c.joined;});
+
+function catBadgeColor(cat){
+  const m={Tech:'#0071e3',Academic:'#34c759',Arts:'#af52de',Business:'#ff9f0a',Gaming:'#5856d6'};
+  return m[cat]||'#636366';
+}
+
+function renderGrid(f){
+  const g=document.getElementById('grid');
+  const list=f==='All'?communities:communities.filter(c=>c.category===f);
+  if(!list.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-tertiary);"><div style="font-size:48px;">🔍</div><p style="margin-top:12px;font-size:16px;font-weight:600;">No communities found</p></div>';return;}
+  g.innerHTML=list.map(c=>{
+    const joined=joinState[c.id];
+    const bc=catBadgeColor(c.category);
+    return `
+    <div class="comm-card">
+      <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;">
+        <div style="width:64px;height:64px;border-radius:var(--radius-lg);background:${c.color}15;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;">${c.emoji}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">${c.name}</div>
+          <span style="background:${bc}15;color:${bc};padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;">${c.category}</span>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;flex:1;">${c.description}</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:16px;">
+        <div style="text-align:center;">
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary);">${c.members.toLocaleString()}</div>
+          <div style="font-size:11px;color:var(--text-tertiary);">Members</div>
+        </div>
+        <div style="width:1px;height:32px;background:var(--border-light);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary);">${c.posts}</div>
+          <div style="font-size:11px;color:var(--text-tertiary);">Posts</div>
+        </div>
+        <div style="width:1px;height:32px;background:var(--border-light);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:16px;font-weight:700;color:${joined?'#1a7f3c':'var(--text-tertiary)'};">${joined?'Joined':'Open'}</div>
+          <div style="font-size:11px;color:var(--text-tertiary);">Status</div>
+        </div>
+      </div>
+      <button class="btn-join ${joined?'joined':'not-joined'}" id="jbtn-${c.id}" onclick="toggleJoin('${c.id}')">
+        ${joined?'Joined ✓':'Join Community'}
+      </button>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function toggleJoin(id){
+  joinState[id]=!joinState[id];
+  const btn=document.getElementById('jbtn-'+id);
+  const j=joinState[id];
+  btn.className='btn-join '+(j?'joined':'not-joined');
+  btn.textContent=j?'Joined ✓':'Join Community';
+  toast(j?'✅ You joined the community!':'👋 You left the community');
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  auth.ensureDemo();
+  buildSidebar('sidebar');
+  renderGrid('All');
+  document.getElementById('chips').addEventListener('click',e=>{
+    const c=e.target.closest('.chip');if(!c)return;
+    document.querySelectorAll('#chips .chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');renderGrid(c.dataset.f);
+  });
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>
