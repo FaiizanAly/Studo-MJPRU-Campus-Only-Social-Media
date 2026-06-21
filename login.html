@@ -2,108 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In — Studo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sign In | UniUFO — Your Campus, Your Community</title>
+  <meta name="description" content="Sign in to UniUFO — the secure campus-only social platform for MJPRU, Bareilly students.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="style.css">
   <style>
-    .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 80px 16px 40px; background: var(--bg-primary); position: relative; overflow: hidden; }
-    .auth-orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
-    .auth-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-2xl); padding: 40px 36px; width: 100%; max-width: 420px; box-shadow: var(--shadow-lg); position: relative; z-index: 1; animation: fadeInUp 0.5s ease both; }
-    .auth-logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 28px; }
-    .auth-logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #0071e3, #5856d6); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-    .auth-logo-text { font-size: 24px; font-weight: 800; color: var(--text-primary); }
-    .auth-heading { font-size: 24px; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 6px; letter-spacing: -0.5px; }
-    .auth-subtitle { font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 28px; line-height: 1.5; }
-    .pw-wrapper { position: relative; }
-    .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-tertiary); display: flex; align-items: center; padding: 4px; border-radius: 6px; }
-    .pw-toggle:hover { color: var(--accent-blue); }
-    .pw-wrapper .input-field { padding-right: 40px; }
-    .forgot-link { font-size: 13px; color: var(--accent-blue); text-decoration: none; font-weight: 500; }
-    .forgot-link:hover { text-decoration: underline; }
-    .auth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-    .auth-divider-line { flex: 1; height: 1px; background: var(--border-light); }
-    .auth-divider-text { font-size: 12px; color: var(--text-tertiary); font-weight: 500; }
-    .google-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 16px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-primary); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s, box-shadow 0.2s; }
-    .google-btn:hover { background: var(--bg-secondary); box-shadow: var(--shadow-sm); }
-    .auth-footer-text { font-size: 13px; color: var(--text-secondary); text-align: center; margin-top: 20px; }
-    .auth-footer-text a { color: var(--accent-blue); text-decoration: none; font-weight: 600; }
-    .auth-footer-text a:hover { text-decoration: underline; }
-    .mjpru-note { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 16px; padding: 8px 12px; background: var(--bg-secondary); border-radius: 8px; line-height: 1.5; }
-    .error-msg { font-size: 13px; color: #ff3b30; text-align: center; margin-top: -8px; margin-bottom: 8px; display: none; padding: 8px 12px; background: #fff0f0; border-radius: 8px; border: 1px solid #ffd0d0; }
-    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
-    .btn-full { width: 100%; justify-content: center; }
+    .auth-page { min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 16px 40px;background:var(--bg-primary);position:relative;overflow:hidden; }
+    .auth-orb  { position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0; }
+    .auth-card { background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:40px 36px;width:100%;max-width:420px;box-shadow:var(--shadow-lg);position:relative;z-index:1;animation:fadeInUp 0.5s ease both; }
+    @media(max-width:480px){ .auth-card { padding:28px 20px; border-radius:var(--radius-xl); } }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .auth-logo { display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px; }
+    .auth-logo-text { font-size:24px;font-weight:800;color:var(--text-primary); }
+    .auth-heading  { font-size:24px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:6px;letter-spacing:-0.5px; }
+    .auth-subtext  { font-size:14px;color:var(--text-secondary);text-align:center;margin-bottom:28px; }
+    .pw-wrapper    { position:relative; }
+    .pw-toggle     { position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:4px; }
+    .pw-toggle:hover { color:var(--text-primary); }
+    .divider-line  { display:flex;align-items:center;gap:12px;margin:20px 0; }
+    .divider-line::before,.divider-line::after { content:'';flex:1;height:1px;background:var(--border-light); }
+    .divider-line span { font-size:12px;color:var(--text-tertiary);white-space:nowrap; }
+    .social-btn    { width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border:1.5px solid var(--border-light);border-radius:var(--radius-lg);background:var(--bg-secondary);color:var(--text-primary);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s,border-color .2s; }
+    .social-btn:hover { background:var(--bg-tertiary);border-color:var(--border-dark); }
+    .error-box     { background:#fff1f0;border:1px solid #ffccc7;border-radius:var(--radius-lg);padding:10px 14px;font-size:13px;color:#c0392b;margin-bottom:16px;display:none; }
+    .mjpru-note    { font-size:12px;color:var(--text-tertiary);text-align:center;margin-top:20px;line-height:1.6; }
   </style>
 </head>
 <body>
-  <main style="padding-top:0;min-height:100vh;background:var(--bg-primary);">
-    <div class="auth-page">
-      <!-- BG orbs -->
-      <div class="auth-orb" style="width:500px;height:500px;top:-200px;right:-150px;background:radial-gradient(circle,rgba(88,86,214,0.14) 0%,transparent 70%);"></div>
-      <div class="auth-orb" style="width:400px;height:400px;bottom:-120px;left:-150px;background:radial-gradient(circle,rgba(0,113,227,0.12) 0%,transparent 70%);"></div>
+  <main class="auth-page">
+    <div class="auth-orb" style="width:400px;height:400px;top:-120px;right:-100px;background:radial-gradient(circle,rgba(37,99,235,.15) 0%,transparent 70%);"></div>
+    <div class="auth-orb" style="width:350px;height:350px;bottom:-80px;left:-120px;background:radial-gradient(circle,rgba(88,86,214,.12) 0%,transparent 70%);"></div>
 
-      <div class="auth-card">
-        <!-- Logo -->
-        <div class="auth-logo">
-          <div class="auth-logo-icon">📚</div>
-          <span class="auth-logo-text">Studo</span>
-        </div>
-
-        <h1 class="auth-heading">Welcome back</h1>
-        <p class="auth-subtitle">Sign in to your MJPRU Studo account</p>
-
-        <div id="error-msg" class="error-msg">❌ Invalid email or password. Try again.</div>
-
-        <form id="login-form" style="display:flex;flex-direction:column;gap:14px;">
-          <!-- Email -->
-          <div class="form-group">
-            <label class="form-label">University Email</label>
-            <input type="email" id="login-email" class="input-field" placeholder="you@mjpru.ac.in" value="faizan.ali@mjpru.ac.in" autocomplete="email" required>
-          </div>
-
-          <!-- Password -->
-          <div class="form-group">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <label class="form-label" style="margin-bottom:0;">Password</label>
-              <a href="#" class="forgot-link">Forgot password?</a>
-            </div>
-            <div class="pw-wrapper">
-              <input type="password" id="login-password" class="input-field" placeholder="Enter your password" value="demo123" autocomplete="current-password" required>
-              <button type="button" class="pw-toggle" id="pw-toggle" title="Show/hide password">
-                <i data-lucide="eye" id="pw-icon" style="width:16px;height:16px;"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Submit -->
-          <button type="submit" class="btn-primary btn-full" id="login-btn" style="margin-top:4px;padding:13px;">
-            Sign In
-          </button>
-        </form>
-
-        <!-- Divider -->
-        <div class="auth-divider">
-          <div class="auth-divider-line"></div>
-          <span class="auth-divider-text">or continue with</span>
-          <div class="auth-divider-line"></div>
-        </div>
-
-        <!-- Google btn -->
-        <button class="google-btn" onclick="alert('Google login — coming soon! Use demo credentials above.')">
-          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M47.5 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h13.22c-.57 2.98-2.29 5.5-4.88 7.19v5.97h7.9c4.62-4.25 7.26-10.52 7.26-17.17z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.15 15.9-5.83l-7.9-5.97c-2.15 1.44-4.9 2.29-8 2.29-6.15 0-11.37-4.15-13.23-9.73H2.6v6.17C6.55 42.69 14.68 48 24 48z"/><path fill="#FBBC05" d="M10.77 28.76A14.92 14.92 0 0 1 9.75 24c0-1.66.29-3.27.79-4.76V13.07H2.6A23.94 23.94 0 0 0 0 24c0 3.87.93 7.54 2.6 10.93l8.17-6.17z"/><path fill="#EA4335" d="M24 9.5c3.47 0 6.58 1.2 9.02 3.53l6.76-6.76C35.93 2.38 30.48 0 24 0 14.68 0 6.55 5.31 2.6 13.07l8.17 6.17C12.63 13.65 17.85 9.5 24 9.5z"/></svg>
-          Continue with Google
-        </button>
-
-        <!-- Switch to register -->
-        <p class="auth-footer-text">
-          Don't have an account? <a href="register.html">Create one</a>
-        </p>
-
-        <!-- Note -->
-        <div class="mjpru-note">
-          🎓 MJPRU students only · @mjpru.ac.in email required<br>
-          <strong>Demo:</strong> faizan.ali@mjpru.ac.in / demo123
-        </div>
+    <div class="auth-card">
+      <!-- Logo -->
+      <div class="auth-logo">
+        <img src="logo.png" alt="UniUFO Logo" width="52" height="52" style="object-fit:contain;">
+        <span class="auth-logo-text">Uni<span style="color:#2563eb;">UFO</span></span>
       </div>
+
+      <h1 class="auth-heading">Welcome back 👋</h1>
+      <p class="auth-subtext">Sign in to your UniUFO campus account</p>
+
+      <div class="error-box" id="error-msg" role="alert">
+        ❌ Incorrect email or password. Please try again.
+      </div>
+
+      <form id="login-form" novalidate>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" for="login-email">University Email</label>
+          <input
+            id="login-email"
+            class="input-field"
+            type="email"
+            placeholder="yourname@mjpru.ac.in"
+            autocomplete="email"
+            required
+          >
+        </div>
+        <div class="form-group" style="margin-bottom:6px;">
+          <label class="form-label" for="login-password">Password</label>
+          <div class="pw-wrapper">
+            <input
+              id="login-password"
+              class="input-field"
+              type="password"
+              placeholder="Enter password"
+              autocomplete="current-password"
+              style="padding-right:44px;"
+              required
+            >
+            <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Toggle password visibility">
+              <i data-lucide="eye" id="pw-icon" style="width:18px;height:18px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <div style="text-align:right;margin-bottom:20px;">
+          <a href="#" style="font-size:13px;color:var(--accent-blue);">Forgot password?</a>
+        </div>
+
+        <button type="submit" id="login-btn" class="btn-primary" style="width:100%;justify-content:center;padding:13px;">
+          Sign In
+        </button>
+      </form>
+
+      <div class="divider-line"><span>or</span></div>
+
+      <button class="social-btn" onclick="alert('Google sign-in coming soon!')">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M44.5 20H24v8.5h11.7C34.2 33.1 29.7 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 2.9l6.1-6.1C34.5 5.9 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.2-4z"/></svg>
+        Continue with Google
+      </button>
+
+      <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:20px;">
+        Don't have an account? <a href="register.html" style="color:var(--accent-blue);font-weight:600;">Register free</a>
+      </p>
+
+
+      <p class="mjpru-note">🎓 MJPRU students only · @mjpru.ac.in email required</p>
     </div>
   </main>
 
@@ -115,6 +111,12 @@
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       lucide.createIcons();
+
+      // If already logged in, go to feed
+      if (auth.isLoggedIn()) {
+        window.location.href = 'feed.html';
+        return;
+      }
 
       // Password show/hide
       const pwToggle = document.getElementById('pw-toggle');
@@ -129,9 +131,9 @@
         lucide.createIcons();
       });
 
-      // Login form submit
-      const form    = document.getElementById('login-form');
-      const errMsg  = document.getElementById('error-msg');
+      // Login form
+      const form     = document.getElementById('login-form');
+      const errMsg   = document.getElementById('error-msg');
       const loginBtn = document.getElementById('login-btn');
 
       form.addEventListener('submit', function (e) {
@@ -141,41 +143,26 @@
 
         errMsg.style.display = 'none';
         loginBtn.textContent = 'Signing in…';
-        loginBtn.disabled = true;
+        loginBtn.disabled    = true;
 
+        // Simulate async auth (would be an API call in production)
         setTimeout(function () {
-          // Demo: accept currentUser email or any @mjpru.ac.in with "demo123"
-          const demoEmails = [
-            'faizan.ali@mjpru.ac.in',
-            'priya.sharma@mjpru.ac.in',
-            'rahul.verma@mjpru.ac.in',
-            'anjali.singh@mjpru.ac.in',
-          ];
-          const valid = (demoEmails.includes(email) && pass === 'demo123') ||
-                        (email.endsWith('@mjpru.ac.in') && pass.length >= 6);
+          // Check against DEMO_ACCOUNTS
+          const account = DEMO_ACCOUNTS.find(
+            a => a.email.toLowerCase() === email && a.password === pass
+          );
 
-          if (valid) {
-            // Log in as Faizan Ali (demo)
-            auth.login({
-              id: 'u1',
-              name: 'Faizan Ali',
-              initials: 'FA',
-              email: 'faizan.ali@mjpru.ac.in',
-              university: 'MJPRU, Bareilly',
-              semester: '3rd Semester',
-              verified: true,
-              avatarColor: 'linear-gradient(135deg, #0071e3, #5856d6)',
-              isCreator: true,
-            }, 'demo-token-123');
-            loginBtn.textContent = '✅ Signed in! Redirecting…';
+          if (account) {
+            auth.login(account.profile, 'uniufo-demo-token-' + account.profile.id);
+            loginBtn.innerHTML  = '✅ Signed in! Redirecting…';
             loginBtn.style.background = '#34c759';
-            setTimeout(() => { window.location.href = 'feed.html'; }, 800);
+            setTimeout(() => { window.location.href = 'feed.html'; }, 700);
           } else {
             errMsg.style.display = 'block';
             loginBtn.textContent = 'Sign In';
-            loginBtn.disabled = false;
+            loginBtn.disabled    = false;
           }
-        }, 900);
+        }, 800);
       });
     });
   </script>

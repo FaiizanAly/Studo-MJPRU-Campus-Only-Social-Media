@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile — Studo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="UniUFO — Your Campus, Your Community. MJPRU Bareilly students platform.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Profile | UniUFO</title>
   <link rel="stylesheet" href="style.css">
   <style>
     .profile-banner {
@@ -168,7 +170,7 @@
       if (currentUser.isCreator) {
         document.getElementById('creator-badge').innerHTML = `
           <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:linear-gradient(135deg,#ff9f0a,#ff6b00);color:white;font-size:12px;font-weight:600;">
-            ⭐ Creator of Studo
+            ⭐ Creator of UniUFO
           </span>`;
         document.getElementById('creator-badge').style.display = 'block';
       }
@@ -236,7 +238,7 @@
       } else {
         content.innerHTML = `
           <div style="display:flex;flex-direction:column;gap:12px;">
-            ${['Joined Studo — Aug 2023','Uploaded "Data Structures Notes"','Liked Priya\'s post about ML project','Registered for TECHNO-2026','Followed Rahul Verma'].map((a,i) => `
+            ${['Joined UniUFO — Aug 2023','Uploaded "Data Structures Notes"','Liked Priya\'s post about ML project','Registered for TECHNO-2026','Followed Rahul Verma'].map((a,i) => `
               <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg-secondary);border-radius:var(--radius-lg);">
                 <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-blue-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                   <i data-lucide="activity" style="width:16px;height:16px;color:var(--accent-blue);"></i>

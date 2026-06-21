@@ -1,7 +1,7 @@
 {
-  "name": "studo-backend-simple",
+  "name": "uniufo-backend",
   "version": "1.0.0",
-  "description": "Studo Simple Backend — Node.js + Express + JSON file database",
+  "description": "UniUFO Backend — Node.js + Express + JSON file database",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

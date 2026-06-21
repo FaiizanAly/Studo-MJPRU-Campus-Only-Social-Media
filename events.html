@@ -2,52 +2,219 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campus Events — Studo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Campus Events | UniUFO — Your Campus, Your Community. MJPRU Bareilly students platform.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Events | UniUFO</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .event-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:20px 20px 20px 24px;margin-bottom:16px;transition:box-shadow .2s,transform .2s;position:relative;overflow:hidden;}
-    .event-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;}
-    .event-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px)}
-    .chip{display:inline-flex;align-items:center;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:500;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-light);cursor:pointer;transition:all .15s}
-    .chip:hover{background:var(--accent-blue-light);color:var(--accent-blue)}
-    .chip.active{background:var(--accent-blue);color:white;border-color:var(--accent-blue)}
-    .progress-bar{height:6px;background:var(--bg-tertiary);border-radius:999px;overflow:hidden;margin-top:6px;}
-    .progress-fill{height:100%;border-radius:999px;transition:width .3s}
-    .btn-register{padding:10px 24px;border:none;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
-    .btn-register.registered{background:#e6f9ee;color:#1a7f3c;}
-    .btn-register.not-registered{background:var(--accent-blue);color:white;}
-    .toast{position:fixed;bottom:24px;right:24px;background:#1c1c1e;color:white;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;z-index:9999;box-shadow:var(--shadow-lg);transform:translateY(20px);opacity:0;transition:all .3s}
-    .toast.show{transform:translateY(0);opacity:1}
+    /* ── Layout ── */
+    .events-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 90px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .events-shell { grid-template-columns: 1fr; padding: 16px 12px 100px; }
+      .sidebar-col  { display: none; }
+    }
+
+    /* ── Event Card ── */
+    .event-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 20px 18px 18px 22px;
+      margin-bottom: 14px;
+      transition: box-shadow .2s, transform .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .event-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+    .event-left-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      border-radius: 4px 0 0 4px;
+    }
+
+    /* ── Card inner flex ── */
+    .event-inner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .event-body    { flex: 1; min-width: 0; }
+    .event-actions { flex-shrink: 0; padding-top: 2px; }
+    @media (max-width: 520px) {
+      .event-inner    { flex-direction: column; }
+      .event-actions  { width: 100%; }
+      .btn-register   { width: 100%; justify-content: center; }
+    }
+
+    /* ── Typography ── */
+    .event-title  { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px; line-height: 1.25; }
+    .event-club   { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+    .event-desc   { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+    @media (max-width: 400px) { .event-title { font-size: 16px; } }
+
+    /* ── Meta row ── */
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin-bottom: 10px;
+    }
+    .event-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .event-meta-item strong { color: var(--text-primary); }
+
+    /* ── Chips ── */
+    .chips-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 18px;
+    }
+    .chips-row::-webkit-scrollbar { display: none; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      padding: 7px 15px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+    .chip:hover  { background: var(--accent-blue-light); color: var(--accent-blue); }
+    .chip.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* ── Progress ── */
+    .progress-bar  { height: 6px; background: var(--bg-tertiary); border-radius: 999px; overflow: hidden; margin-top: 5px; }
+    .progress-fill { height: 100%; border-radius: 999px; transition: width .3s; }
+
+    /* ── Register button ── */
+    .btn-register {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 22px;
+      border: none;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn-register.registered    { background: #e6f9ee; color: #1a7f3c; }
+    .btn-register.not-registered{ background: var(--accent-blue); color: white; }
+    .btn-register.not-registered:hover { background: var(--accent-blue-hover); }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-tertiary); }
+    .empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 15px; font-weight: 600; }
+
+    /* ── Page header ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .page-header h1 { font-size: clamp(20px, 5vw, 24px); font-weight: 700; color: var(--text-primary); letter-spacing: -.02em; }
+    .page-header p  { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 16px;
+      background: #1c1c1e;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 9999;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all .3s;
+      max-width: calc(100vw - 32px);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    @media (max-width: 520px) { .toast { bottom: 80px; } }
   </style>
 </head>
 <body>
 <main style="padding-top:56px;min-height:100vh;background:var(--bg-primary);">
-  <div style="max-width:1200px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:start;">
-    <div id="sidebar" style="position:sticky;top:72px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:16px;display:flex;flex-direction:column;gap:0;min-height:calc(100vh - 100px);"></div>
+  <div class="events-shell">
+
+    <!-- Sidebar (hidden on mobile) -->
+    <div class="sidebar-col">
+      <div id="sidebar" class="sidebar" style="position:sticky;top:72px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:16px;display:flex;flex-direction:column;gap:0;min-height:calc(100vh - 100px);"></div>
+    </div>
+
+    <!-- Main content -->
     <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div class="page-header">
         <div>
-          <h1 style="font-size:24px;font-weight:700;color:var(--text-primary);letter-spacing:-.02em;">🗓️ Campus Events</h1>
-          <p style="font-size:14px;color:var(--text-secondary);margin-top:2px;">Upcoming events at MJPRU, Bareilly</p>
+          <h1>🗓️ Campus Events</h1>
+          <p>Upcoming events at MJPRU, Bareilly</p>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;background:var(--accent-blue-light);color:var(--accent-blue);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;">
+        <div style="display:flex;align-items:center;gap:6px;background:var(--accent-blue-light);color:var(--accent-blue);padding:7px 13px;border-radius:999px;font-size:13px;font-weight:600;flex-shrink:0;">
           <i data-lucide="calendar" style="width:14px;height:14px;"></i> 5 Upcoming
         </div>
       </div>
-      <!-- Filter chips -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="chips">
-        <span class="chip active" data-f="All">All</span>
-        <span class="chip" data-f="Hackathon">💻 Hackathon</span>
-        <span class="chip" data-f="Career">💼 Career</span>
-        <span class="chip" data-f="Wellness">🧘 Wellness</span>
-        <span class="chip" data-f="Arts">🎨 Arts</span>
-        <span class="chip" data-f="Sports">🏏 Sports</span>
+
+      <!-- Filter chips (horizontally scrollable on mobile) -->
+      <div class="chips-row" id="chips" role="tablist" aria-label="Filter events">
+        <span class="chip active" data-f="All" role="tab" tabindex="0">All</span>
+        <span class="chip" data-f="Hackathon" role="tab" tabindex="0">💻 Hackathon</span>
+        <span class="chip" data-f="Career"    role="tab" tabindex="0">💼 Career</span>
+        <span class="chip" data-f="Wellness"  role="tab" tabindex="0">🧘 Wellness</span>
+        <span class="chip" data-f="Arts"      role="tab" tabindex="0">🎨 Arts</span>
+        <span class="chip" data-f="Sports"    role="tab" tabindex="0">🏏 Sports</span>
       </div>
+
       <div id="events-list"></div>
     </div>
   </div>
 </main>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -56,89 +223,130 @@
 <script src="js/api.js"></script>
 <script src="js/components.js"></script>
 <script>
-const eventsState={};
-events.forEach(e=>{eventsState[e.id]=e.registered;});
+  // Track registration state per event
+  const eventsState = {};
+  events.forEach(ev => { eventsState[ev.id] = ev.registered; });
 
-function typeEmoji(t){
-  const m={Hackathon:'💻',Career:'💼',Wellness:'🧘',Arts:'🎨',Sports:'🏏'};
-  return m[t]||'📌';
-}
+  function typeEmoji(t) {
+    const m = { Hackathon:'💻', Career:'💼', Wellness:'🧘', Arts:'🎨', Sports:'🏏' };
+    return m[t] || '📌';
+  }
 
-function renderEvents(f){
-  const list=document.getElementById('events-list');
-  const filtered=f==='All'?events:events.filter(e=>e.type===f);
-  if(!filtered.length){list.innerHTML='<div style="text-align:center;padding:60px;color:var(--text-tertiary);"><div style="font-size:48px;">📭</div><p style="margin-top:12px;font-size:16px;font-weight:600;">No events in this category</p></div>';return;}
-  list.innerHTML=filtered.map(ev=>{
-    const reg=eventsState[ev.id];
-    const pct=ev.capacity?Math.round((ev.attendees/ev.capacity)*100):null;
-    return `
-    <div class="event-card" id="ecard-${ev.id}" style="border-left:4px solid ${ev.color};">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-            <span style="background:${ev.color}20;color:${ev.color};padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;">${typeEmoji(ev.type)} ${ev.type}</span>
-            ${reg?'<span style="background:#e6f9ee;color:#1a7f3c;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">Registered ✓</span>':''}
+  function renderEvents(filter) {
+    const list     = document.getElementById('events-list');
+    const filtered = filter === 'All' ? events : events.filter(ev => ev.type === filter);
+
+    if (!filtered.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="emoji">📭</div>
+          <p>No events in this category</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(ev => {
+      const reg = eventsState[ev.id];
+      const pct = ev.capacity ? Math.round((ev.attendees / ev.capacity) * 100) : null;
+      return `
+        <article class="event-card" id="ecard-${ev.id}" aria-label="${ev.title}">
+          <div class="event-left-bar" style="background:${ev.color};"></div>
+          <div class="event-inner">
+            <div class="event-body">
+              <!-- Badges row -->
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap;">
+                <span class="badge" style="background:${ev.color}20;color:${ev.color};">${typeEmoji(ev.type)} ${ev.type}</span>
+                ${reg ? '<span class="badge" style="background:#e6f9ee;color:#1a7f3c;">Registered ✓</span>' : ''}
+              </div>
+              <!-- Title & organiser -->
+              <div class="event-title">${ev.title}</div>
+              <div class="event-club">${ev.club}</div>
+              <!-- Date / Location -->
+              <div class="event-meta">
+                <span class="event-meta-item">
+                  <i data-lucide="calendar" style="width:14px;height:14px;color:var(--accent-blue);"></i>
+                  <strong>${ev.date}</strong>&nbsp;·&nbsp;${ev.time}
+                </span>
+                <span class="event-meta-item">
+                  <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--accent-blue);"></i>
+                  ${ev.location}
+                </span>
+              </div>
+              <!-- Description -->
+              <p class="event-desc">${ev.description}</p>
+              <!-- Attendees -->
+              ${ev.capacity ? `
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:3px;">
+                  <span><i data-lucide="users" style="width:12px;height:12px;display:inline;"></i> ${ev.attendees} attending</span>
+                  <span>${ev.capacity} capacity · ${pct}% full</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width:${pct}%;background:${ev.color};"></div>
+                </div>
+              </div>` : `
+              <div style="font-size:12px;color:var(--text-secondary);">👥 ${ev.attendees} students attending · Open event</div>`}
+            </div>
+            <!-- Register button -->
+            <div class="event-actions">
+              <button
+                class="btn-register ${reg ? 'registered' : 'not-registered'}"
+                id="rbtn-${ev.id}"
+                onclick="toggleReg('${ev.id}')"
+                aria-pressed="${reg ? 'true' : 'false'}"
+              >
+                ${reg ? '✓ Registered' : 'Register'}
+              </button>
+            </div>
           </div>
-          <div style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:4px;line-height:1.2;">${ev.title}</div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">${ev.club}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px;">
-            <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-secondary);">
-              <i data-lucide="calendar" style="width:14px;height:14px;color:var(--accent-blue);"></i>
-              <strong style="color:var(--text-primary);">${ev.date}</strong> &nbsp;·&nbsp; ${ev.time}
-            </div>
-            <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-secondary);">
-              <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--accent-blue);"></i>
-              ${ev.location}
-            </div>
-          </div>
-          <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:14px;">${ev.description}</div>
-          ${ev.capacity?`
-          <div style="margin-bottom:4px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:4px;">
-              <span><i data-lucide="users" style="width:12px;height:12px;display:inline;"></i> ${ev.attendees} attending</span>
-              <span>${ev.capacity} capacity · ${pct}% full</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${ev.color};"></div></div>
-          </div>`:`
-          <div style="font-size:12px;color:var(--text-secondary);">👥 ${ev.attendees} students attending · Open event</div>`}
-        </div>
-        <div style="flex-shrink:0;padding-top:4px;">
-          <button class="btn-register ${reg?'registered':'not-registered'}" id="rbtn-${ev.id}" onclick="toggleReg('${ev.id}')">
-            ${reg?'Registered ✓':'Register'}
-          </button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  lucide.createIcons();
-}
+        </article>`;
+    }).join('');
 
-function toggleReg(id){
-  eventsState[id]=!eventsState[id];
-  const btn=document.getElementById('rbtn-'+id);
-  const reg=eventsState[id];
-  btn.className='btn-register '+(reg?'registered':'not-registered');
-  btn.textContent=reg?'Registered ✓':'Register';
-  toast(reg?'✅ You are registered!':'❌ Registration cancelled');
-}
+    lucide.createIcons();
+  }
 
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
+  function toggleReg(id) {
+    eventsState[id] = !eventsState[id];
+    const reg = eventsState[id];
+    const btn = document.getElementById('rbtn-' + id);
+    btn.className = 'btn-register ' + (reg ? 'registered' : 'not-registered');
+    btn.textContent = reg ? '✓ Registered' : 'Register';
+    btn.setAttribute('aria-pressed', reg ? 'true' : 'false');
+    showToast(reg ? '✅ You are registered!' : '❌ Registration cancelled');
+  }
 
-document.addEventListener('DOMContentLoaded',()=>{
-  auth.ensureDemo();
-  buildSidebar('sidebar');
-  renderEvents('All');
-  document.getElementById('chips').addEventListener('click',e=>{
-    const c=e.target.closest('.chip');if(!c)return;
-    document.querySelectorAll('#chips .chip').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');renderEvents(c.dataset.f);
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Keyboard support for chips
+  function initChips() {
+    const chipsEl = document.getElementById('chips');
+    chipsEl.addEventListener('click', e => {
+      const c = e.target.closest('.chip');
+      if (!c) return;
+      document.querySelectorAll('#chips .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      renderEvents(c.dataset.f);
+    });
+    chipsEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.target.click();
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    auth.ensureDemo();
+    buildSidebar('sidebar');
+    renderEvents('All');
+    initChips();
+    lucide.createIcons();
   });
-  lucide.createIcons();
-});
 </script>
 </body>
 </html>

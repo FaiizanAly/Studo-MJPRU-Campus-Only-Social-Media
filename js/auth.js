@@ -1,23 +1,29 @@
 // ============================================
-// STUDO — Auth (localStorage based)
+// UniUFO — Auth (localStorage based)
+// No auto-login. Users must sign in manually.
 // ============================================
 
 const auth = {
+  _KEY_USER:  'uniufo_user',
+  _KEY_TOKEN: 'uniufo_token',
+
   login(user, token) {
-    localStorage.setItem('studo_user', JSON.stringify(user));
-    if (token) localStorage.setItem('studo_token', token);
+    localStorage.setItem(this._KEY_USER, JSON.stringify(user));
+    if (token) localStorage.setItem(this._KEY_TOKEN, token);
   },
   logout() {
-    localStorage.removeItem('studo_user');
-    localStorage.removeItem('studo_token');
+    localStorage.removeItem(this._KEY_USER);
+    localStorage.removeItem(this._KEY_TOKEN);
     window.location.href = 'index.html';
   },
   getUser() {
-    const stored = localStorage.getItem('studo_user');
-    return stored ? JSON.parse(stored) : null;
+    try {
+      const stored = localStorage.getItem(this._KEY_USER);
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) { return null; }
   },
   getToken() {
-    return localStorage.getItem('studo_token');
+    return localStorage.getItem(this._KEY_TOKEN);
   },
   isLoggedIn() {
     return !!this.getUser();
@@ -29,20 +35,11 @@ const auth = {
     }
     return true;
   },
-  // For demo: auto-login as Faizan Ali if no user set
+  // Used by app pages — redirects to login if no user (NO auto-login)
   ensureDemo() {
-    if (!this.getUser()) {
-      this.login({
-        id: 'u1',
-        name: 'Faizan Ali',
-        initials: 'FA',
-        email: 'faizan.ali@mjpru.ac.in',
-        university: 'MJPRU, Bareilly',
-        semester: '3rd Semester',
-        verified: true,
-        avatarColor: 'linear-gradient(135deg, #0071e3, #5856d6)',
-        isCreator: true,
-      });
+    if (!this.isLoggedIn()) {
+      window.location.href = 'login.html';
+      return null;
     }
     return this.getUser();
   }
