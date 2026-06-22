@@ -241,12 +241,22 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      auth.ensureDemo();
+      // Admin-only page — redirect non-admins
+      const user = auth.ensureDemo();
+      if (!user) return; // ensureDemo already redirects to login
+
+      if (!user.isAdmin) {
+        alert('🚫 Access denied. This page is for UniUFO admins only.');
+        window.location.href = 'feed.html';
+        return;
+      }
+
       buildSidebar('sidebar');
       renderStats();
       renderVerifications();
       if (typeof lucide !== 'undefined') lucide.createIcons();
     });
+
   </script>
 </body>
 </html>

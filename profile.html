@@ -68,6 +68,7 @@
           </div>
           <div id="profile-username" style="font-size:14px;color:var(--text-tertiary);margin-top:2px;"></div>
           <div id="creator-badge" style="display:none;margin-top:8px;"></div>
+          <div id="admin-badge"   style="display:none;margin-top:6px;"></div>
         </div>
         <button class="btn-primary" style="font-size:13px;padding:9px 20px;">
           <i data-lucide="message-circle" style="width:14px;height:14px;"></i> Message
@@ -151,48 +152,66 @@
 
     function renderProfile() {
       profileUser = auth.ensureDemo();
+      if (!profileUser) return;
 
       // Avatar
       const avatar = document.getElementById('profile-avatar');
-      avatar.style.background = profileUser.avatarColor;
-      avatar.textContent = profileUser.initials;
+      avatar.style.background = profileUser.avatarColor || 'linear-gradient(135deg,#0071e3,#5856d6)';
+      avatar.textContent = profileUser.initials || '?';
 
-      document.getElementById('profile-name').textContent = profileUser.name;
-      document.getElementById('profile-username').textContent = '@' + (profileUser.username || profileUser.name.toLowerCase().replace(' ','.'));
-      document.getElementById('profile-bio').textContent = currentUser.bio;
+      document.getElementById('profile-name').textContent = profileUser.name || '';
+      document.getElementById('profile-username').textContent = '@' + (profileUser.username || profileUser.name.toLowerCase().replace(/ /g,'.'));
+      document.getElementById('profile-bio').textContent = profileUser.bio || '';
 
-      // Verified
+      // Verified badge
       if (profileUser.verified) {
         document.getElementById('verified-badge').style.display = 'flex';
       }
 
-      // Creator badge
-      if (currentUser.isCreator) {
-        document.getElementById('creator-badge').innerHTML = `
+      // Creator badge — ONLY for admin/creator account
+      const creatorBadge = document.getElementById('creator-badge');
+      if (profileUser.isCreator) {
+        creatorBadge.innerHTML = `
           <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:linear-gradient(135deg,#ff9f0a,#ff6b00);color:white;font-size:12px;font-weight:600;">
             ⭐ Creator of UniUFO
           </span>`;
-        document.getElementById('creator-badge').style.display = 'block';
+        creatorBadge.style.display = 'block';
+      } else {
+        creatorBadge.style.display = 'none';
       }
 
-      // Meta
-      document.getElementById('profile-meta').innerHTML = `
-        <span class="tag"><i data-lucide="graduation-cap" style="width:12px;height:12px;margin-right:4px;"></i>${currentUser.degree}</span>
-        <span class="tag"><i data-lucide="map-pin" style="width:12px;height:12px;margin-right:4px;"></i>MJPRU, Bareilly</span>
-        <span class="tag"><i data-lucide="book-open" style="width:12px;height:12px;margin-right:4px;"></i>${currentUser.department}</span>
-        <span class="tag"><i data-lucide="calendar" style="width:12px;height:12px;margin-right:4px;"></i>${currentUser.semester}</span>
-        <span class="tag"><i data-lucide="mail" style="width:12px;height:12px;margin-right:4px;"></i>${currentUser.email}</span>`;
+      // Admin badge — extra badge for admin users
+      const adminBadge = document.getElementById('admin-badge');
+      if (adminBadge) {
+        if (profileUser.isAdmin) {
+          adminBadge.innerHTML = `
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:linear-gradient(135deg,#0071e3,#5856d6);color:white;font-size:11px;font-weight:700;">
+              🛡️ Admin · UniUFO
+            </span>`;
+          adminBadge.style.display = 'block';
+        } else {
+          adminBadge.style.display = 'none';
+        }
+      }
 
-      // Stats
-      document.getElementById('stat-posts').textContent     = currentUser.posts;
-      document.getElementById('stat-followers').textContent = currentUser.followers;
-      document.getElementById('stat-following').textContent = currentUser.following;
-      document.getElementById('stat-joined').textContent    = currentUser.joinedAt;
+      // Meta tags — use logged-in user's data
+      document.getElementById('profile-meta').innerHTML = `
+        <span class="tag"><i data-lucide="graduation-cap" style="width:12px;height:12px;margin-right:4px;"></i>${profileUser.degree || ''}</span>
+        <span class="tag"><i data-lucide="map-pin" style="width:12px;height:12px;margin-right:4px;"></i>MJPRU, Bareilly</span>
+        <span class="tag"><i data-lucide="book-open" style="width:12px;height:12px;margin-right:4px;"></i>${profileUser.department || ''}</span>
+        <span class="tag"><i data-lucide="calendar" style="width:12px;height:12px;margin-right:4px;"></i>${profileUser.semester || ''}</span>
+        <span class="tag"><i data-lucide="mail" style="width:12px;height:12px;margin-right:4px;"></i>${profileUser.email || ''}</span>`;
+
+      // Stats — use logged-in user's data
+      document.getElementById('stat-posts').textContent     = profileUser.posts     || 0;
+      document.getElementById('stat-followers').textContent = profileUser.followers  || 0;
+      document.getElementById('stat-following').textContent = profileUser.following  || 0;
+      document.getElementById('stat-joined').textContent    = profileUser.joinedAt   || '—';
 
       // Edit form prefill
-      document.getElementById('edit-name').value    = profileUser.name;
-      document.getElementById('edit-bio').value     = currentUser.bio;
-      document.getElementById('edit-semester').value = currentUser.semester;
+      document.getElementById('edit-name').value     = profileUser.name     || '';
+      document.getElementById('edit-bio').value      = profileUser.bio      || '';
+      document.getElementById('edit-semester').value = profileUser.semester || '';
 
       switchTab('posts');
       if (typeof lucide !== 'undefined') lucide.createIcons();

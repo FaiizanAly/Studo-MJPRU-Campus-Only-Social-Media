@@ -127,11 +127,16 @@
            <a href="register.html" class="btn-secondary" style="width:100%;justify-content:center;">Register</a>`;
 
 
+    const adminNavBadge = (!landing && user && user.isAdmin)
+      ? `<span style="font-size:10px;font-weight:700;color:white;background:linear-gradient(135deg,#0071e3,#5856d6);padding:2px 8px;border-radius:999px;letter-spacing:.04em;flex-shrink:0;">ADMIN</span>`
+      : '';
+
     const navbar = `
       <nav id="main-nav" role="navigation" aria-label="Main navigation">
         <a href="index.html" class="nav-logo" aria-label="UniUFO Home">
           ${_logoImg(32)}
           <span class="nav-logo-text">Uni<span style="color:#2563eb;">UFO</span></span>
+          ${adminNavBadge}
         </a>
         ${centerHTML}
         <div class="nav-right">${rightHTML}</div>
@@ -143,6 +148,7 @@
             <div style="display:flex;align-items:center;gap:8px;">
               ${_logoImg(26)}
               <span style="font-size:16px;font-weight:800;color:var(--text-primary);">Uni<span style="color:#2563eb;">UFO</span></span>
+              ${adminNavBadge}
             </div>
             <button id="menu-close-btn" class="dark-toggle" aria-label="Close menu">
               <i data-lucide="x"></i>
@@ -153,6 +159,7 @@
           <div style="display:flex;flex-direction:column;gap:8px;">${authFooter}</div>
         </div>
       </div>`;
+
 
     document.body.insertAdjacentHTML('afterbegin', navbar);
 
@@ -289,30 +296,44 @@
     const user        = (typeof auth !== 'undefined') ? auth.ensureDemo() : null;
     if (!user) return; // ensureDemo redirects to login if not logged in
     const page        = getCurrentPage();
-    const links       = ALL_NAV_LINKS.map(l => `
+
+    // Filter links: Admin link only for admin users
+    const visibleLinks = ALL_NAV_LINKS.filter(l => {
+      if (l.href === 'admin.html') return user.isAdmin === true;
+      return true;
+    });
+
+    const links       = visibleLinks.map(l => `
       <a href="${l.href}" class="nav-item${page === l.href ? ' active' : ''}" aria-current="${page === l.href ? 'page' : 'false'}">
         <i data-lucide="${l.icon}"></i>${l.label}
       </a>`).join('');
+
     const initials    = user.initials    || '?';
     const avatarColor = user.avatarColor || 'linear-gradient(135deg,#0071e3,#5856d6)';
     const name        = user.name        || 'Student';
     const semester    = user.semester    || 'MJPRU';
+    const roleLabel   = user.isAdmin
+      ? `<span style="font-size:10px;font-weight:700;color:white;background:linear-gradient(135deg,#0071e3,#5856d6);padding:1px 7px;border-radius:999px;margin-left:4px;">ADMIN</span>`
+      : `<span style="font-size:10px;font-weight:600;color:var(--accent-blue);background:var(--accent-blue-light);padding:1px 7px;border-radius:999px;margin-left:4px;">Student</span>`;
 
     const html = `
-      <a href="profile.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--bg-card);border:1px solid var(--border-light);margin-bottom:16px;text-decoration:none;" aria-label="View profile">
+      <a href="profile.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--bg-card);border:1px solid var(--border-light);margin-bottom:16px;text-decoration:none;${user.isAdmin ? 'border-color:#0071e3;box-shadow:0 0 0 1px #0071e320;' : ''}" aria-label="View profile">
         <div style="width:36px;height:36px;border-radius:50%;background:${avatarColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true">
           <span style="color:white;font-size:12px;font-weight:700;">${initials}</span>
         </div>
         <div style="overflow:hidden;min-width:0;">
-          <div style="font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;">${name}${roleLabel}</div>
           <div style="font-size:11px;color:var(--text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${semester} · MJPRU</div>
         </div>
       </a>
       <nav style="display:flex;flex-direction:column;gap:2px;" aria-label="Sidebar navigation">${links}</nav>
       <div style="flex:1;"></div>
       <div style="padding:12px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border-light);margin-top:16px;">
-        <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">🎓 MJPRU Verified Campus</div>
-        <div style="font-size:11px;color:var(--text-tertiary);line-height:1.5;">Only verified MJPRU students can post and interact.</div>
+        ${user.isAdmin
+          ? `<div style="font-size:12px;font-weight:700;color:#0071e3;margin-bottom:4px;">🛡️ Admin Mode Active</div>
+             <div style="font-size:11px;color:var(--text-tertiary);line-height:1.5;">You have full admin access to UniUFO platform.</div>`
+          : `<div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">🎓 MJPRU Verified Campus</div>
+             <div style="font-size:11px;color:var(--text-tertiary);line-height:1.5;">Only verified MJPRU students can post and interact.</div>`}
         <div style="font-size:10px;color:var(--text-tertiary);margin-top:6px;border-top:1px solid var(--border-light);padding-top:6px;">
           Made by <strong style="color:var(--accent-blue);">Faizan Ali</strong> · MCA · MJPRU
         </div>
